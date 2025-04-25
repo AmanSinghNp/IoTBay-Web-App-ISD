@@ -1,0 +1,70 @@
+<%- include('partials/header') %>
+
+<section class="min-h-screen flex items-center justify-center bg-gray-100 py-8">
+  <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-xl">
+    <h2 class="text-2xl font-bold mb-6 text-center">Add New IoT Device</h2>
+
+    <form action="/devices/new" method="POST" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium">Device Name</label>
+        <input
+          type="text"
+          name="name"
+          required
+          class="mt-1 w-full px-4 py-2 border rounded-md"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium">Brand</label>
+        <input
+          type="text"
+          name="brand"
+          required
+          class="mt-1 w-full px-4 py-2 border rounded-md"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium">Price</label>
+        <input
+          type="number"
+          name="price"
+          step="0.01"
+          required
+          class="mt-1 w-full px-4 py-2 border rounded-md"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium">Stock Quantity</label>
+        <input
+          type="number"
+          name="stock"
+          required
+          class="mt-1 w-full px-4 py-2 border rounded-md"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium">Description</label>
+        <textarea
+          name="description"
+          rows="4"
+          class="mt-1 w-full px-4 py-2 border rounded-md"
+        ></textarea>
+      </div>
+
+      <div class="flex justify-end">
+        <button
+          type="submit"
+          class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700"
+        >
+          Add Device
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,62 @@
+<%- include('partials/header') %>
+
+<section class="bg-white py-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-10">
+      <h1 class="text-3xl font-bold text-gray-800">Browse IoT Products</h1>
+      <p class="mt-2 text-gray-500">
+        Discover our extensive range of IoT devices and components
+      </p>
+    </div>
+
+    <% if (userRole === 'staff') { %>
+    <div class="flex justify-end mb-6">
+      <a
+        href="/devices/new"
+        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+      >
+        + Add New Device
+      </a>
+    </div>
+    <% } %> <% if (devices.length === 0) { %>
+    <p class="text-center text-gray-500">No devices found.</p>
+    <% } else { %>
+    <div
+      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+    >
+      <% devices.forEach(device => { %>
+      <div
+        class="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl transition duration-300"
+      >
+        <div class="p-4">
+          <h2 class="text-lg font-semibold text-gray-800">
+            <%= device.name %>
+          </h2>
+          <p class="text-sm text-gray-500 mb-2"><%= device.brand %></p>
+          <p class="text-sm text-gray-600 mb-4"><%= device.description %></p>
+          <div class="flex justify-between items-center">
+            <span class="text-blue-600 font-bold"
+              >$<%= device.price.toFixed(2) %></span
+            >
+            <% if (device.stock > 0) { %>
+            <span class="text-sm text-green-600">In Stock</span>
+            <% } else { %>
+            <span class="text-sm text-red-500">Out of Stock</span>
+            <% } %>
+          </div>
+        </div>
+        <div class="bg-gray-100 px-4 py-3 flex justify-end">
+          <button
+            class="bg-blue-600 text-white text-sm px-3 py-1 rounded hover:bg-blue-700 transition"
+          >
+            View Details
+          </button>
+        </div>
+      </div>
+      <% }); %>
+    </div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

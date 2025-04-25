@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- Font Awesome CDN -->
+  <script
+    src="https://kit.fontawesome.com/your-kit-id.js"
+    crossorigin="anonymous"
+  ></script>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IoT Bay</title>
+
+    <!-- ✅ Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Optional custom style -->
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="bg-gray-100 text-gray-800">
+    <header class="bg-white shadow-sm">
+      <div
+        class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center"
+      >
+        <h1 class="text-2xl font-bold text-blue-700">IoT Bay</h1>
+        <nav class="space-x-4 text-gray-600">
+          <a href="/" class="hover:text-blue-600">Home</a>
+          <a href="/devices" class="hover:text-blue-600">Browse</a>
+          <% if (userName) { %>
+          <a href="/dashboard" class="hover:text-blue-600">Dashboard</a>
+          <a href="/logout" class="hover:text-red-600">Logout</a>
+          <% } else { %>
+          <a href="/login" class="hover:text-blue-600">Login</a>
+          <a href="/register" class="hover:text-blue-600">Register</a>
+          <% } %>
+        </nav>
+      </div>
+    </header>
+  </body>
+</html>

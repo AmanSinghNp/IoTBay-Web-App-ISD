@@ -1,0 +1,45 @@
+<%- include('partials/header') %>
+
+<section class="min-h-screen flex items-center justify-center bg-gray-100">
+  <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+    <h2 class="text-2xl font-bold mb-6 text-center">Login to Your Account</h2>
+
+    <form action="/login" method="POST" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium">Email</label>
+        <input
+          type="email"
+          name="email"
+          required
+          class="mt-1 w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium">Password</label>
+        <input
+          type="password"
+          name="password"
+          required
+          class="mt-1 w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <button
+        type="submit"
+        class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 font-semibold"
+      >
+        Login
+      </button>
+    </form>
+
+    <p class="text-sm text-center mt-4">
+      Don’t have an account?
+      <a href="/register" class="text-blue-600 hover:underline"
+        >Register here</a
+      >
+    </p>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

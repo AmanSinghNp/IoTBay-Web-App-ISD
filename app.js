@@ -6,6 +6,8 @@ const bodyParser = require("body-parser");
 const sequelize = require("./config/database");
 const User = require("./models/user");
 const Device = require("./models/device");
+const Order = require("./models/order");
+const Payment = require("./models/payment");
 
 const authRoutes = require("./routes/auth");
 const deviceRoutes = require("./routes/devices");
@@ -72,3 +74,8 @@ sequelize
   .catch((err) => {
     console.error("❌ Failed to sync DB:", err);
   });
+
+// 404 Page Handler
+app.use((req, res, next) => {
+  res.status(404).render("404");
+});

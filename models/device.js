@@ -1,3 +1,4 @@
+// models/device.js
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 
@@ -16,10 +17,11 @@ const Device = sequelize.define("Device", {
   },
   stock: {
     type: DataTypes.INTEGER,
+    allowNull: false,
     defaultValue: 0,
   },
   description: {
-    type: DataTypes.TEXT,
+    type: DataTypes.STRING,
   },
 });
 

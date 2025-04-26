@@ -1,8 +1,9 @@
 <%- include('partials/header') %>
 
+<!-- Main Section -->
 <section class="min-h-screen bg-gray-100 py-8">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <!-- Greeting -->
+    <!-- Greeting Section -->
     <div
       class="bg-gradient-to-r from-blue-800 to-blue-500 text-white rounded-lg p-6 shadow mb-8"
     >
@@ -12,42 +13,67 @@
       </p>
     </div>
 
-    <!-- Grid layout -->
+    <!-- Dashboard Layout -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-      <!-- Sidebar -->
+      <!-- Sidebar Section -->
       <aside class="md:col-span-1 bg-white rounded-lg shadow p-4 space-y-4">
         <div class="flex flex-col items-center">
+          <!-- User Icon -->
           <div
             class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center text-3xl text-gray-600"
           >
             <i class="fas fa-user-circle"></i>
           </div>
+
+          <!-- User Name -->
           <h2 class="mt-2 font-semibold text-lg"><%= userName %></h2>
-          <span class="text-sm text-gray-500">Customer</span>
+
+          <!-- Dynamic User Role: Staff or Customer -->
+          <span class="text-sm text-gray-500">
+            <%= userRole === 'staff' ? 'Staff' : 'Customer' %>
+          </span>
         </div>
 
+        <!-- Sidebar Navigation -->
         <nav class="space-y-2 mt-4">
-          <a href="/devices" class="block text-sm text-blue-600 hover:underline"
-            >Browse Devices</a
+          <!-- Show different link for staff vs customer -->
+          <% if (userRole === 'staff') { %>
+          <a
+            href="/devices"
+            class="block text-sm text-blue-600 hover:underline"
           >
-          <a href="/orders" class="block text-sm text-blue-600 hover:underline"
-            >My Orders</a
+            Manage Devices
+          </a>
+          <% } else { %>
+          <a
+            href="/devices"
+            class="block text-sm text-blue-600 hover:underline"
           >
+            Browse Devices
+          </a>
+          <% } %>
+
+          <!-- Common Links for Everyone -->
+          <a href="/orders" class="block text-sm text-blue-600 hover:underline">
+            My Orders
+          </a>
           <a
             href="/payments"
             class="block text-sm text-blue-600 hover:underline"
-            >My Payments</a
           >
-          <a href="/logout" class="block text-sm text-red-500 hover:underline"
-            >Logout</a
-          >
+            My Payments
+          </a>
+          <a href="/logout" class="block text-sm text-red-500 hover:underline">
+            Logout
+          </a>
         </nav>
       </aside>
 
-      <!-- Dashboard cards -->
+      <!-- Dashboard Cards Section -->
       <div
         class="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
       >
+        <!-- Orders Card -->
         <div class="bg-white p-6 rounded-lg shadow">
           <div class="text-blue-600 text-3xl mb-2">
             <i class="fas fa-box"></i>
@@ -58,6 +84,7 @@
           </p>
         </div>
 
+        <!-- Payments Card -->
         <div class="bg-white p-6 rounded-lg shadow">
           <div class="text-green-600 text-3xl mb-2">
             <i class="fas fa-credit-card"></i>
@@ -68,6 +95,7 @@
           </p>
         </div>
 
+        <!-- Settings Card -->
         <div class="bg-white p-6 rounded-lg shadow">
           <div class="text-purple-600 text-3xl mb-2">
             <i class="fas fa-cog"></i>

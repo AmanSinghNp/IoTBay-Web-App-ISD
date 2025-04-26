@@ -5,6 +5,11 @@
     <h2 class="text-2xl font-bold mb-6 text-center">Login to Your Account</h2>
 
     <form action="/login" method="POST" class="space-y-4">
+      <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+      <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">
+        <%= errorMessage %>
+      </div>
+      <% } %>
       <div>
         <label class="block text-sm font-medium">Email</label>
         <input

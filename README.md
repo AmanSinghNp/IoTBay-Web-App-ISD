@@ -77,3 +77,14 @@ Then go to
 ```
 http://localhost:3000
 ```
+
+### For Max/ Linux
+
+### ⚡ Quick Setup (Linux/macOS/WSL)
+
+```bash
+chmod +x setup.sh
+
+./setup.sh
+
+```

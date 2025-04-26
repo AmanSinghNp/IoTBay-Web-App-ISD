@@ -11,21 +11,35 @@ router.get("/login", (req, res) => {
 // POST login form
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  const user = await User.findOne({ where: { email } });
 
-  if (!user) {
-    return res.send("Invalid email or password.");
+  if (!email || !password) {
+    return res.render("login", {
+      errorMessage: "Please enter both email and password.",
+    });
   }
 
-  const match = await bcrypt.compare(password, user.password);
+  try {
+    const user = await User.findOne({ where: { email } });
 
-  if (match) {
-    req.session.userId = user.id;
-    req.session.userName = user.fullName;
-    req.session.userRole = user.role;
-    res.redirect("/dashboard");
-  } else {
-    res.send("Invalid email or password.");
+    if (!user) {
+      return res.render("login", {
+        errorMessage: "Invalid email or password.",
+      });
+    }
+
+    const match = await bcrypt.compare(password, user.password);
+
+    if (match) {
+      req.session.userId = user.id;
+      req.session.userName = user.fullName;
+      req.session.userRole = user.role;
+      res.redirect("/dashboard");
+    } else {
+      res.render("login", { errorMessage: "Invalid email or password." });
+    }
+  } catch (err) {
+    console.error(err);
+    res.render("login", { errorMessage: "Internal server error." });
   }
 });
 
@@ -38,19 +52,63 @@ router.get("/register", (req, res) => {
 router.post("/register", async (req, res) => {
   const { fullName, email, phone, password } = req.body;
 
-  const hash = await bcrypt.hash(password, 10);
+  if (!fullName || !email || !password) {
+    return res.render("register", {
+      errorMessage: "Please fill in all required fields.",
+    });
+  }
 
   try {
+    const existingUser = await User.findOne({ where: { email } });
+
+    if (existingUser) {
+      return res.render("register", {
+        errorMessage: "Email is already registered.",
+      });
+    }
+
+    const hash = await bcrypt.hash(password, 10);
+
     await User.create({
       fullName,
       email,
       phone,
       password: hash,
-      role: "customer", // Default role
+      role: "customer",
     });
+
     res.redirect("/login");
   } catch (error) {
-    res.send("Error registering user. Email might already be taken.");
+    console.error(error);
+    res.render("register", { errorMessage: "Internal server error." });
+  }
+});
+
+// TEMPORARY: Create a staff user manually
+router.get("/createstaff", async (req, res) => {
+  try {
+    const exists = await User.findOne({
+      where: { email: "staff@example.com" },
+    });
+    if (exists) {
+      return res.send("⚠️ Staff user already exists. Try logging in.");
+    }
+
+    const bcrypt = require("bcrypt");
+    const hashed = await bcrypt.hash("123456", 10);
+
+    await User.create({
+      fullName: "Admin User",
+      email: "staff@example.com",
+      password: hashed,
+      phone: "123456789",
+      role: "staff",
+    });
+
+    res.send("✅ Staff user created. Login with staff@example.com / 123456");
+  } catch (err) {
+    console.error(err);
+    res.send("❌ Something went wrong.");
   }
 });
 

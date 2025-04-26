@@ -25,4 +25,14 @@ router.post("/devices/new", async (req, res) => {
   }
 });
 
+// GET /devices (list all devices)
+router.get("/devices", async (req, res) => {
+  try {
+    const devices = await Device.findAll();
+    res.render("devices_list", { devices }); // Ensure you have devices_list.ejs
+  } catch (err) {
+    res.status(500).send("Failed to load devices");
+  }
+});
+
 module.exports = router;

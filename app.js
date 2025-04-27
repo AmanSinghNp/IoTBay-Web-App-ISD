@@ -13,6 +13,7 @@ const authRoutes = require("./routes/auth");
 const deviceRoutes = require("./routes/devices");
 const orderRoutes = require("./routes/orders");
 const paymentRoutes = require("./routes/payments");
+const userRoutes = require("./routes/user");
 
 const app = express();
 const PORT = 3000;
@@ -48,6 +49,7 @@ app.use("/", authRoutes);
 app.use("/", deviceRoutes);
 app.use("/", orderRoutes);
 app.use("/", paymentRoutes);
+app.use("/", userRoutes);
 
 // Home route
 app.get("/", (req, res) => {

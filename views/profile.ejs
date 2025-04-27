@@ -1,0 +1,86 @@
+<%- include('partials/header') %>
+
+<section class="min-h-screen bg-gray-100 py-8">
+  <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
+    <!-- Profile Title -->
+    <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">
+      My Profile
+    </h2>
+
+    <!-- Success Message -->
+    <% if (successMessage) { %>
+    <div class="bg-green-100 text-green-800 p-2 rounded mb-4 text-center">
+      <%= successMessage %>
+    </div>
+    <% } %>
+
+    <!-- Error Message -->
+    <% if (errorMessage) { %>
+    <div class="bg-red-100 text-red-800 p-2 rounded mb-4 text-center">
+      <%= errorMessage %>
+    </div>
+    <% } %>
+
+    <!-- Update Profile Form -->
+    <form action="/profile" method="POST" class="space-y-4">
+      <div>
+        <label class="block text-gray-700">Full Name</label>
+        <input
+          type="text"
+          name="fullName"
+          value="<%= user.fullName %>"
+          required
+          class="w-full border border-gray-300 px-3 py-2 rounded focus:outline-none focus:ring focus:border-blue-300"
+        />
+      </div>
+
+      <div>
+        <label class="block text-gray-700">Email</label>
+        <input
+          type="email"
+          name="email"
+          value="<%= user.email %>"
+          required
+          class="w-full border border-gray-300 px-3 py-2 rounded focus:outline-none focus:ring focus:border-blue-300"
+        />
+      </div>
+
+      <div>
+        <label class="block text-gray-700">Phone</label>
+        <input
+          type="text"
+          name="phone"
+          value="<%= user.phone %>"
+          class="w-full border border-gray-300 px-3 py-2 rounded focus:outline-none focus:ring focus:border-blue-300"
+        />
+      </div>
+
+      <!-- Update Button -->
+      <button
+        type="submit"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
+      >
+        Update Profile
+      </button>
+    </form>
+
+    <!-- Divider -->
+    <hr class="my-6" />
+
+    <!-- Delete Account Form -->
+    <form
+      action="/profile/delete"
+      method="POST"
+      onsubmit="return confirm('Are you sure you want to delete your account?');"
+    >
+      <button
+        type="submit"
+        class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded"
+      >
+        Delete My Account
+      </button>
+    </form>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

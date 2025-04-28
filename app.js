@@ -1,7 +1,6 @@
 const express = require("express");
 const path = require("path");
 const session = require("express-session");
-const bodyParser = require("body-parser");
 
 const sequelize = require("./config/database");
 const User = require("./models/user");
@@ -24,9 +23,9 @@ app.set("view engine", "ejs");
 // Public static folder
 app.use(express.static(path.join(__dirname, "public")));
 
-// Body parser
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+// express parser
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // ✅ Session MUST come before routes or custom middleware
 app.use(

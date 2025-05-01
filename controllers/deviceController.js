@@ -26,10 +26,10 @@ exports.postAddDevice = async (req, res) => {
     return res.status(403).send("Access denied.");
   }
 
-  const { name, brand, price, stock, description } = req.body;
+  const { name, brand,catalog, price, stock, description } = req.body;
 
   try {
-    await Device.create({ name, brand, price, stock, description });
+    await Device.create({ name, brand, catalog,price, stock, description });
     res.redirect("/devices");
   } catch (err) {
     console.error(err);

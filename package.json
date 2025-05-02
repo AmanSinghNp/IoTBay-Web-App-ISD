@@ -2,7 +2,7 @@
   "name": "iotbay-web-app-isd",
   "version": "1.0.0",
   "description": "Best ever Project",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,7 +11,6 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
-    "body-parser": "^2.2.0",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
     "express-session": "^1.18.1",

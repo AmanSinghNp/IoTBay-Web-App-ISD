@@ -11,6 +11,12 @@ const Device = sequelize.define("Device", {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  catalog: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: "uncategorized",
+    
+  },
   price: {
     type: DataTypes.FLOAT,
     allowNull: false,

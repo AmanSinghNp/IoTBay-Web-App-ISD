@@ -1,38 +1,26 @@
 const express = require("express");
 const router = express.Router();
-const Device = require("../models/device");
+const deviceController = require("../controllers/deviceController");
 
-// GET /devices/new (show form)
-router.get("/devices/new", (req, res) => {
-  if (!req.session.userId || req.session.userRole !== "staff") {
-    return res.status(403).send("Access denied");
-  }
-  res.render("devices_form");
-});
+// GET /devices/new - Display form to add a new device (staff only)
+router.get("/devices/new", deviceController.getAddDeviceForm);
 
-// POST /devices/new (submit form)
-router.post("/devices/new", async (req, res) => {
-  if (!req.session.userId || req.session.userRole !== "staff") {
-    return res.status(403).send("Access denied");
-  }
+// POST /devices/new - Handle form submission to add a new device (staff only)
+router.post("/devices/new", deviceController.postAddDevice);
 
-  try {
-    const { name, brand, catalog, price, stock, description } = req.body;
-    await Device.create({ name, brand, catalog, price, stock, description });
-    res.redirect("/devices");
-  } catch (err) {
-    res.status(500).send("Failed to create device");
-  }
-});
+// GET /devices - Display a list of all devices (with search, filter, and sort support)
+router.get("/devices", deviceController.getAllDevices);
 
-// GET /devices (list all devices)
-router.get("/devices", async (req, res) => {
-  try {
-    const devices = await Device.findAll();
-    res.render("devices_list", { devices }); // Ensure you have devices_list.ejs
-  } catch (err) {
-    res.status(500).send("Failed to load devices");
-  }
-});
+// GET /devices/:id - View details for a single device by ID
+router.get("/devices/:id", deviceController.viewDeviceDetails);
+
+// GET /devices/edit/:id - Display edit form for an existing device (staff only)
+router.get("/devices/edit/:id", deviceController.getEditDeviceForm);
+
+// POST /devices/edit/:id - Handle update submission for an existing device (staff only)
+router.post("/devices/edit/:id", deviceController.updateDevice);
+
+// POST /devices/delete/:id - Delete a device by ID (staff only)
+router.post("/devices/delete/:id", deviceController.deleteDevice);
 
 module.exports = router;

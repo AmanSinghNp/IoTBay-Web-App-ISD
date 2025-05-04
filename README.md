@@ -18,16 +18,19 @@ The system follows the **MVC (Model–View–Controller)** design pattern and is
 
 ### 🧑 User Features
 
-- Register / Login / Logout
-- Browse available IoT devices
-- Place, cancel, and view orders
-- Track and view payment history
+- Register, Login, Logout
+- Browse devices (search, filter, sort)
+- Inline device detail view
+- Place and cancel orders
+- View order history and order details
+- View and manage payments
 
 ### 🧑‍💻 Staff Features
 
-- Add new devices to inventory
-- Stock management
-- Role-based access control (staff vs customer)
+- Add new devices
+- Edit or delete devices
+- View all products with admin controls
+- Role-based access control
 
 ---
 
@@ -56,8 +59,8 @@ The system follows the **MVC (Model–View–Controller)** design pattern and is
 ### 📦 1. Clone the Repository
 
 ```bash
-git clone thisurl
-cd iotbay-mvp
+git clone https://github.com/AmanSinghNp/IoTBay-Web-App-ISD
+cd IoTBay-Web-App-ISD
 ```
 
 ### 📦 2. Install Dependencies
@@ -69,6 +72,7 @@ npm install
 ### 3. Run the APP
 
 ```bash
+node seed.js
 node app.js
 ```
 
@@ -78,13 +82,34 @@ Then go to
 http://localhost:3000
 ```
 
-### For Max/ Linux
+## 📁 Folder Structure
 
-### ⚡ Quick Setup (Linux/macOS/WSL)
+/controllers # Route handlers
+/models # Sequelize models
+/routes # Express route definitions
+/views # EJS templates (pages, partials)
+/public # Static assets (CSS, JS, etc)
 
-```bash
-chmod +x setup.sh
+---
 
-./setup.sh
+## 🔐 Login Instructions
 
-```
+The application includes two pre-seeded users for testing:
+
+### Staff User
+
+- **Email**: admin@example.com
+- **Password**: 123456
+- **Role**: Staff
+- Can add, edit, and delete devices
+
+### Customer User
+
+- **Email**: john@example.com
+- **Password**: 123456
+- **Role**: Customer
+- Can browse products, place orders, and view payments
+
+You can log in using the `/login` page on the site.
+
+To create more users, register from the `/register` page. New accounts are customer role by default.

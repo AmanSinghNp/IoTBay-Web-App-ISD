@@ -15,7 +15,6 @@ const Device = sequelize.define("Device", {
     type: DataTypes.STRING,
     allowNull: false,
     defaultValue: "uncategorized",
-    
   },
   price: {
     type: DataTypes.FLOAT,
@@ -28,6 +27,10 @@ const Device = sequelize.define("Device", {
   },
   description: {
     type: DataTypes.STRING,
+  },
+  imageUrl: {
+    type: DataTypes.STRING,
+    allowNull: true,
   },
 });
 

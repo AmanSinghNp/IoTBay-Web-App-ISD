@@ -1,0 +1,60 @@
+<%- include('partials/header') %>
+
+<section class="min-h-screen flex items-center justify-center bg-gray-100 py-8">
+  <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-lg">
+    <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">
+      Edit Payment (ID: <%= payment.id %>)
+    </h2>
+
+    <form
+      action="/payments/edit/<%= payment.id %>"
+      method="POST"
+      class="space-y-4"
+    >
+      <div>
+        <label class="block text-sm font-medium">Order</label>
+        <input
+          type="text"
+          disabled
+          value="Order #<%= payment.Order?.id %> - $<%= payment.amount.toFixed(2) %>"
+          class="mt-1 w-full px-4 py-2 border rounded-md bg-gray-100 text-gray-600"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium">Payment Method</label>
+        <input
+          type="text"
+          name="paymentMethod"
+          value="<%= payment.paymentMethod %>"
+          required
+          class="mt-1 w-full px-4 py-2 border rounded-md"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium">Amount</label>
+        <input
+          type="number"
+          name="amount"
+          step="0.01"
+          value="<%= payment.amount %>"
+          required
+          class="mt-1 w-full px-4 py-2 border rounded-md"
+        />
+      </div>
+
+      <div class="flex justify-between">
+        <a href="/payments" class="text-blue-600 hover:underline">← Back</a>
+        <button
+          type="submit"
+          class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700"
+        >
+          Save Changes
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

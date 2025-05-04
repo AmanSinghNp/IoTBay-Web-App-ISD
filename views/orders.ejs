@@ -23,25 +23,39 @@
         <tbody class="text-gray-600 text-sm font-light">
           <% orders.forEach(order => { %>
           <tr class="border-b border-gray-200 hover:bg-gray-100">
+            <!-- Link to view order details -->
             <td class="py-3 px-6 whitespace-nowrap">
-              <%= order.Device ? order.Device.name : 'Unknown Device' %>
+              <a
+                href="/orders/view/<%= order.id %>"
+                class="text-blue-600 hover:underline"
+              >
+                <%= order.Device ? order.Device.name : 'Unknown Device' %>
+              </a>
             </td>
+
             <td class="py-3 px-6"><%= order.quantity %></td>
+
             <td class="py-3 px-6">
               <span
-                class="px-2 py-1 rounded-full text-xs <%= order.status === 'Placed' ? 'bg-green-100 text-green-700' : order.status === 'Cancelled' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700' %>"
+                class="px-2 py-1 rounded-full text-xs <%= order.status === 'Placed' ? 'bg-green-100 text-green-700' : order.status === 'Cancelled' ? 'bg-red-100 text-red-700' : 'bg-gray-200 text-gray-600' %>"
               >
                 <%= order.status %>
               </span>
             </td>
+
             <td class="py-3 px-6">
               <%= new Date(order.createdAt).toLocaleString() %>
             </td>
+
             <td class="py-3 px-6 text-center">
               <% if (order.status === 'Placed') { %>
-              <div class="flex justify-center space-x-2">
+              <div class="flex flex-col sm:flex-row justify-center gap-2">
                 <!-- Cancel Button -->
-                <form action="/orders/cancel/<%= order.id %>" method="POST">
+                <form
+                  action="/orders/cancel/<%= order.id %>"
+                  method="POST"
+                  onsubmit="return confirm('Are you sure you want to cancel this order?');"
+                >
                   <button
                     type="submit"
                     class="bg-red-500 text-white text-xs px-3 py-1 rounded hover:bg-red-600"
@@ -50,18 +64,18 @@
                   </button>
                 </form>
 
-                <!-- Update Form (Optional Simplified) -->
+                <!-- Update Quantity Form -->
                 <form
                   action="/orders/update/<%= order.id %>"
                   method="POST"
-                  class="flex items-center"
+                  class="flex items-center gap-1"
                 >
                   <input
                     type="number"
                     name="quantity"
                     min="1"
                     value="<%= order.quantity %>"
-                    class="border w-16 text-center text-xs rounded mr-2 py-1"
+                    class="border w-16 text-center text-xs rounded py-1"
                   />
                   <button
                     type="submit"

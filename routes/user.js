@@ -12,4 +12,6 @@ router.post("/profile", userController.updateProfile);
 // Delete account
 router.post("/profile/delete", userController.deleteAccount);
 
+router.get("/dashboard", userController.showDashboard);
+
 module.exports = router;

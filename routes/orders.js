@@ -3,16 +3,19 @@ const express = require("express");
 const router = express.Router();
 const orderController = require("../controllers/orderController");
 
-// View all orders (for logged-in user)
+// Show all orders for the logged-in user
 router.get("/orders", orderController.viewOrders);
 
-// Create a new order (placing an order)
+// Create a new order (via form submission)
 router.post("/orders/new", orderController.createOrder);
 
-// Cancel an order (before finalization)
+// Update an order's quantity
+router.post("/orders/update/:id", orderController.updateOrder);
+
+// Cancel an existing order
 router.post("/orders/cancel/:id", orderController.cancelOrder);
 
-// Update an order quantity (before finalization)
-router.post("/orders/update/:id", orderController.updateOrder);
+// View details of a specific order
+router.get("/orders/view/:id", orderController.viewOrderDetails);
 
 module.exports = router;

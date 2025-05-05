@@ -134,3 +134,25 @@ exports.updateOrder = async (req, res) => {
     res.status(500).send("Failed to update order.");
   }
 };
+
+// View single order details
+exports.viewOrderDetails = async (req, res) => {
+  if (!req.session.userId) return res.redirect("/login");
+
+  const orderId = req.params.id;
+
+  try {
+    const order = await Order.findByPk(orderId, {
+      include: [Device],
+    });
+
+    if (!order || order.userId !== req.session.userId) {
+      return res.status(403).send("Unauthorized or order not found.");
+    }
+
+    res.render("order_details", { order });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Failed to load order details.");
+  }
+};

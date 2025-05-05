@@ -1,17 +1,19 @@
 const sequelize = require("./config/database");
+const bcrypt = require("bcrypt");
+
 const User = require("./models/user");
 const Device = require("./models/device");
 const Order = require("./models/order");
 const Payment = require("./models/payment");
-const bcrypt = require("bcrypt");
 
 async function seed() {
   try {
-    await sequelize.sync({ force: true }); // Reset DB
+    await sequelize.sync({ force: true });
 
-    // Create sample users
+    // Password for all users
     const passwordHash = await bcrypt.hash("123456", 10);
 
+    // Users
     const customer = await User.create({
       fullName: "John Doe",
       email: "john@example.com",
@@ -28,49 +30,61 @@ async function seed() {
       role: "staff",
     });
 
-    // Create sample devices
-    const device1 = await Device.create({
-      name: "Smart Light Bulb",
-      brand: "Philips",
-      price: 29.99,
-      stock: 100,
-      description: "WiFi-enabled smart bulb with remote control.",
-    });
+    // 25 Devices
+    const devices = [];
+    for (let i = 1; i <= 25; i++) {
+      devices.push({
+        name: `IoT Device ${i}`,
+        brand: i % 2 === 0 ? "Ring" : "Philips",
+        catalog: i % 3 === 0 ? "Security" : "Smart Home",
+        price: parseFloat((Math.random() * 100 + 20).toFixed(2)),
+        stock: Math.floor(Math.random() * 15 + 1),
+        description: `Description for IoT device ${i}`,
+        imageUrl: null,
+      });
+    }
+    const createdDevices = await Device.bulkCreate(devices);
 
-    const device2 = await Device.create({
-      name: "IoT Security Camera",
-      brand: "Ring",
-      price: 129.99,
-      stock: 50,
-      description: "Monitor your home from anywhere with live video.",
-    });
+    // 20 Orders
+    const orders = [];
+    for (let i = 0; i < 20; i++) {
+      const device =
+        createdDevices[Math.floor(Math.random() * createdDevices.length)];
+      const quantity = Math.floor(Math.random() * 3 + 1);
+      const status = i % 4 === 0 ? "Cancelled" : "Placed";
 
-    const device3 = await Device.create({
-      name: "Smart Thermostat",
-      brand: "Nest",
-      price: 199.99,
-      stock: 30,
-      description: "Automatically adjust your home's temperature.",
-    });
+      orders.push({
+        userId: customer.id,
+        deviceId: device.id,
+        quantity,
+        status,
+      });
 
-    // Create sample orders
-    const order = await Order.create({
-      userId: customer.id,
-      deviceId: device1.id,
-      quantity: 2,
-      status: "Placed",
-    });
+      // Adjust stock if not cancelled
+      if (status === "Placed") {
+        device.stock -= quantity;
+        await device.save();
+      }
+    }
+    const createdOrders = await Order.bulkCreate(orders);
 
-    // Create sample payments
-    await Payment.create({
-      userId: customer.id,
-      orderId: order.id,
-      amount: 59.98,
-      paymentMethod: "Credit Card",
-      status: "Completed",
-    });
+    // 20 Payments (linked to orders with status "Placed")
+    const payments = [];
+    for (const order of createdOrders) {
+      if (order.status !== "Placed") continue;
 
-    console.log("✅ Seed completed successfully!");
+      payments.push({
+        userId: customer.id,
+        orderId: order.id,
+        amount: parseFloat((order.quantity * 49.99).toFixed(2)),
+        paymentMethod: Math.random() > 0.5 ? "Credit Card" : "PayPal",
+        status: Math.random() > 0.2 ? "Completed" : "Pending",
+      });
+    }
+
+    await Payment.bulkCreate(payments);
+
+    console.log("✅ Seed completed: 2 users, 25 devices, 20 orders, payments");
     process.exit();
   } catch (err) {
     console.error("❌ Seed failed:", err);

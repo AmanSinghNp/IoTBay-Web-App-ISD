@@ -1,12 +1,8 @@
 const express = require("express");
 const router = express.Router();
+const paymentController = require("../controllers/paymentController");
 
-// Payments page
-router.get("/payments", (req, res) => {
-  if (!req.session.userId) {
-    return res.redirect("/login");
-  }
-  res.render("payments");
-});
+// GET /payments – user’s payments
+router.get("/payments", paymentController.getMyPayments);
 
 module.exports = router;

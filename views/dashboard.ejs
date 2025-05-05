@@ -11,6 +11,16 @@
       <p class="mt-2 text-white/90">
         Manage your account, orders, and devices here.
       </p>
+      <!-- Access Log Summary -->
+      <div class="mt-4 text-white/80 text-sm">
+        <p>Total Sessions: <strong><%= sessionCount %></strong></p>
+        <p>
+          Last Login:
+          <strong>
+            <%= lastLogin ? new Date(lastLogin).toLocaleString() : "Unknown" %>
+          </strong>
+        </p>
+      </div>
     </div>
 
     <!-- Dashboard Layout -->

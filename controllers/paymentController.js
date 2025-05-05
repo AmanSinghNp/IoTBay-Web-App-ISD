@@ -4,19 +4,19 @@ const Order = require("../models/order");
 
 // View payment history
 exports.getMyPayments = async (req, res) => {
-  if (!req.session.userId) {
-    return res.redirect("/login");
-  }
+  if (!req.session.userId) return res.redirect("/login");
 
   try {
     const payments = await Payment.findAll({
       where: { userId: req.session.userId },
       include: [Order],
+      order: [["createdAt", "DESC"]],
     });
-    res.render("payments", { payments });
+
+    return res.render("payments", { payments });
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Failed to fetch payments.");
+    console.error("Error loading payments:", err);
+    return res.status(500).send("Failed to fetch payments.");
   }
 };
 

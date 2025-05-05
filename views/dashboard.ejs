@@ -11,6 +11,16 @@
       <p class="mt-2 text-white/90">
         Manage your account, orders, and devices here.
       </p>
+      <!-- Access Log Summary -->
+      <div class="mt-4 text-white/80 text-sm">
+        <p>Total Sessions: <strong><%= sessionCount %></strong></p>
+        <p>
+          Last Login:
+          <strong>
+            <%= lastLogin ? new Date(lastLogin).toLocaleString() : "Unknown" %>
+          </strong>
+        </p>
+      </div>
     </div>
 
     <!-- Dashboard Layout -->
@@ -74,7 +84,10 @@
         class="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
       >
         <!-- Orders Card -->
-        <div class="bg-white p-6 rounded-lg shadow">
+        <a
+          href="/orders"
+          class="block bg-white p-6 rounded-lg shadow hover:shadow-md transition"
+        >
           <div class="text-blue-600 text-3xl mb-2">
             <i class="fas fa-box"></i>
           </div>
@@ -82,10 +95,13 @@
           <p class="text-sm text-gray-500">
             View your current and past orders.
           </p>
-        </div>
+        </a>
 
         <!-- Payments Card -->
-        <div class="bg-white p-6 rounded-lg shadow">
+        <a
+          href="/payments"
+          class="block bg-white p-6 rounded-lg shadow hover:shadow-md transition"
+        >
           <div class="text-green-600 text-3xl mb-2">
             <i class="fas fa-credit-card"></i>
           </div>
@@ -93,10 +109,13 @@
           <p class="text-sm text-gray-500">
             Manage payment history and billing.
           </p>
-        </div>
+        </a>
 
         <!-- Settings Card -->
-        <div class="bg-white p-6 rounded-lg shadow">
+        <a
+          href="/profile"
+          class="block bg-white p-6 rounded-lg shadow hover:shadow-md transition"
+        >
           <div class="text-purple-600 text-3xl mb-2">
             <i class="fas fa-cog"></i>
           </div>
@@ -104,7 +123,7 @@
           <p class="text-sm text-gray-500">
             Update your profile and preferences.
           </p>
-        </div>
+        </a>
       </div>
     </div>
   </div>

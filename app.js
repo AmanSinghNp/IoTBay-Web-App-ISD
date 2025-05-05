@@ -13,6 +13,7 @@ const deviceRoutes = require("./routes/devices");
 const orderRoutes = require("./routes/orders");
 const paymentRoutes = require("./routes/payments");
 const userRoutes = require("./routes/user");
+const routes = require("./routes");
 
 const app = express();
 const PORT = 3000;
@@ -65,7 +66,7 @@ app.get("/dashboard", (req, res) => {
 
 // DB sync + server start
 sequelize
-.sync({ alter: true })
+  .sync({ alter: true })
   .then(() => {
     console.log("✅ Database synced");
     app.listen(PORT, () => {
@@ -79,4 +80,19 @@ sequelize
 // 404 Page Handler
 app.use((req, res, next) => {
   res.status(404).render("404");
+});
+
+// Add userName and userRole to all views BEFORE routes
+app.use((req, res, next) => {
+  res.locals.userName = req.session.userName || null;
+  res.locals.userRole = req.session.userRole || null;
+  next();
+});
+
+// Mount all routes
+app.use("/", routes);
+
+// Home route
+app.get("/", (req, res) => {
+  res.render("index");
 });

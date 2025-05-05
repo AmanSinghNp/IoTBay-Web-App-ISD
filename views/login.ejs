@@ -4,12 +4,22 @@
   <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
     <h2 class="text-2xl font-bold mb-6 text-center">Login to Your Account</h2>
 
+    <!-- Success Message -->
+    <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+    <div class="bg-green-100 text-green-800 px-4 py-2 rounded mb-4 text-center">
+      <%= successMessage %>
+    </div>
+    <% } %>
+
+    <!-- Error Message -->
+    <% if (typeof error !== 'undefined' && error) { %>
+    <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4 text-center">
+      <%= error %>
+    </div>
+    <% } %>
+
+    <!-- Login Form -->
     <form action="/login" method="POST" class="space-y-4">
-      <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
-      <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">
-        <%= errorMessage %>
-      </div>
-      <% } %>
       <div>
         <label class="block text-sm font-medium">Email</label>
         <input

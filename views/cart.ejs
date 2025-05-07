@@ -1,28 +1,42 @@
 <%- include('partials/header') %>
 
-<section class="…">
-  <div class="…">
-    <% if (typeof cartItems !== 'undefined') { %>
-      <!-- Generic Cart Page -->
-      <h1>Your Cart</h1>
-      <% if (cartItems.length === 0) { %>
-        <p>Your cart is empty.</p>
+<div class="min-h-screen flex flex-col">
+  <main class="flex-grow py-12">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-3xl font-bold mb-6">Your Cart</h1>
+
+      <% if (!cartItems.length) { %>
+        <p class="text-gray-600">
+          Your cart is empty.
+          <a href="/devices" class="text-blue-600">Browse devices &rarr;</a>
+        </p>
       <% } else { %>
-        <ul>
+        <ul class="space-y-4">
           <% cartItems.forEach(item => { %>
-            <li><%= item.name %> — $<%= item.price.toFixed(2) %></li>
+            <li class="flex justify-between items-center bg-white shadow rounded p-4">
+              <div class="flex items-center space-x-4">
+                <% if (item.Device.imageUrl) { %>
+                  <img src="<%= item.Device.imageUrl %>"
+                       class="w-16 h-16 object-cover rounded" />
+                <% } %>
+                <div>
+                  <h2 class="font-semibold text-lg"><%= item.Device.name %></h2>
+                  <p>Qty: <%= item.quantity %></p>
+                  <p>Unit price: $<%= item.Device.price.toFixed(2) %></p>
+                </div>
+              </div>
+              <form action="/cart/remove/<%= item.id %>" method="POST"
+                    onsubmit="return confirm('Remove this item and restore stock?');">
+                <button type="submit"
+                        class="bg-red-600 text-white py-1 px-4 rounded hover:bg-red-700">
+                  Remove
+                </button>
+              </form>
+            </li>
           <% }) %>
         </ul>
       <% } %>
-
-    <% } else if (product) { %>
-      <!-- Single-product “cart” page (your existing design) -->
-      <div class="…grid layout…">
-        <!-- left: product details -->
-        <!-- right: stock + add-to-cart + shipping + buy buttons -->
-      </div>
-    <% } %>
-  </div>
-</section>
-
-<%- include('partials/footer') %>
+    </div>
+  </main>
+  <%- include('partials/footer') %>
+</div>

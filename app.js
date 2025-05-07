@@ -8,17 +8,37 @@ const Device = require("./models/device");
 const Order = require("./models/order");
 const Payment = require("./models/payment");
 
+
+const Cart   = require('./models/cart');
+
+
+// Define the relationships:
+User.hasMany(Cart,    { foreignKey: "userId" });
+Cart.belongsTo(User,  { foreignKey: "userId" });
+
+Device.hasMany(Cart,  { foreignKey: "deviceId" });
+Cart.belongsTo(Device,{ foreignKey: "deviceId" });
+
+
 const authRoutes = require("./routes/auth");
 const deviceRoutes = require("./routes/devices");
 const orderRoutes = require("./routes/orders");
 const paymentRoutes = require("./routes/payments");
 const userRoutes = require("./routes/user");
-const cartRoutes = require("./routes/cart");
+
+
+const productRoutes = require("./routes/product"); 
+
+const cartRoutes   = require("./routes/cart");
+
+
 const routes = require("./routes");
 
 
 const app = express();
 const PORT = 3000;
+
+
 
 // View engine
 app.set("views", path.join(__dirname, "views"));
@@ -40,10 +60,21 @@ app.use(
   })
 );
 
+
+
 // ✅ Add userName to all views BEFORE routes
 app.use((req, res, next) => {
   res.locals.userName = req.session.userName || null;
   res.locals.userRole = req.session.userRole || null;
+  next();
+});
+
+
+
+// Flash middleware: pull from session into locals, then clear
+app.use((req, res, next) => {
+  res.locals.flash = req.session.flash;
+  delete req.session.flash;
   next();
 });
 
@@ -54,7 +85,8 @@ app.use("/", deviceRoutes);
 app.use("/", orderRoutes);
 app.use("/", paymentRoutes);
 app.use("/", userRoutes);
-app.use("/", cartRoutes);
+app.use("/", cartRoutes); // Cart routes
+app.use("/", productRoutes); 
 
 // Home route
 app.get("/", (req, res) => {

@@ -1,0 +1,28 @@
+<%- include('partials/header') %>
+
+<section class="…">
+  <div class="…">
+    <% if (typeof cartItems !== 'undefined') { %>
+      <!-- Generic Cart Page -->
+      <h1>Your Cart</h1>
+      <% if (cartItems.length === 0) { %>
+        <p>Your cart is empty.</p>
+      <% } else { %>
+        <ul>
+          <% cartItems.forEach(item => { %>
+            <li><%= item.name %> — $<%= item.price.toFixed(2) %></li>
+          <% }) %>
+        </ul>
+      <% } %>
+
+    <% } else if (product) { %>
+      <!-- Single-product “cart” page (your existing design) -->
+      <div class="…grid layout…">
+        <!-- left: product details -->
+        <!-- right: stock + add-to-cart + shipping + buy buttons -->
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

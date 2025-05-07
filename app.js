@@ -13,12 +13,15 @@ const deviceRoutes = require("./routes/devices");
 const orderRoutes = require("./routes/orders");
 const paymentRoutes = require("./routes/payments");
 const userRoutes = require("./routes/user");
+const cartRoutes = require("./routes/cart");
 const routes = require("./routes");
+
 
 const app = express();
 const PORT = 3000;
 
 // View engine
+app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
 // Public static folder
@@ -45,11 +48,13 @@ app.use((req, res, next) => {
 });
 
 // Routes
+
 app.use("/", authRoutes);
 app.use("/", deviceRoutes);
 app.use("/", orderRoutes);
 app.use("/", paymentRoutes);
 app.use("/", userRoutes);
+app.use("/", cartRoutes);
 
 // Home route
 app.get("/", (req, res) => {

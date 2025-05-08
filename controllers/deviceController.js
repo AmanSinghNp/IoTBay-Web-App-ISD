@@ -19,12 +19,17 @@ exports.getAllDevices = async (req, res) => {
     where.catalog = catalog;
   }
 
-  if (sort === "price-asc") {
+
+ if (sort === "price-asc") {
     order.push(["price", "ASC"]);
   } else if (sort === "price-desc") {
     order.push(["price", "DESC"]);
   } else if (sort === "stock-desc") {
     order.push(["stock", "DESC"]);
+  } else if (sort === "brand-asc") {
+    
+    order.push(["brand", "ASC"], ["name", "ASC"]);
+  
   } else {
     order.push(["name", "ASC"]);
   }

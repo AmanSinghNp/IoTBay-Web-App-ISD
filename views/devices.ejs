@@ -29,7 +29,9 @@
     
       <!--  Sort Option -->
       <select name="sort" class="px-4 py-2 border rounded-md w-full">
+       
         <option value="name-asc" <%= filters.sort === "name-asc" ? "selected" : "" %>>Sort: Name (A-Z)</option>
+        <option value="brand-asc" <%= filters.sort === "brand-asc" ? "selected" : "" %>>Sort: Company (A–Z)</option>
         <option value="price-asc" <%= filters.sort === "price-asc" ? "selected" : "" %>>Sort: Price (Low → High)</option>
         <option value="price-desc" <%= filters.sort === "price-desc" ? "selected" : "" %>>Sort: Price (High → Low)</option>
         <option value="stock-desc" <%= filters.sort === "stock-desc" ? "selected" : "" %>>Sort: Stock (High → Low)</option>

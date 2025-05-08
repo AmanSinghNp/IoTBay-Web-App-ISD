@@ -3,36 +3,52 @@ const sequelize = require("./config/database");
 const Device = require("./models/device");
 
 const dummyDevices = [
-  { name: "Smart Light Bulb",           brand: "Philips",    catalog:"Lighting",                   price: 29.99,  stock: 100, description: "Wi-Fi enabled smart bulb" },
-  { name: "Smart Thermostat",            brand: "Nest",       catalog:"Home Improvement",           price: 199.99, stock: 50,  description: "Energy-saving thermostat" },
-  { name: "Security Camera",             brand: "Ring",       catalog:"Electronics",                price: 149.99, stock: 30,  description: "1080p wireless camera" },
-  { name: "Smart Door Lock",             brand: "August",     catalog:"Home Improvement",           price: 249.99, stock: 20,  description: "Keyless entry system" },
-  { name: "Fitness Tracker",             brand: "Fitbit",     catalog:"Sports, Fitness & Outdoors",  price: 99.99,  stock: 80,  description: "Track your daily fitness" },
-  { name: "Smart Plug",                  brand: "TP-Link",     catalog:"Home Improvement",           price: 24.99,  stock: 150, description: "Control outlets remotely" },
-  { name: "Indoor Air Quality Monitor",  brand: "Awair",      catalog:"Electronics",                price: 119.99, stock: 40,  description: "Monitor air quality" },
-  { name: "LED Smart Strip",             brand: "Govee",      catalog:"Lighting",                   price: 49.99,  stock: 80,  description: "RGBIC addressable LED strip" },
-  { name: "Smart Ceiling Lamp",          brand: "Yeelight",   catalog:"Lighting",                   price: 59.99,  stock: 60,  description: "Dimmable ceiling light with app control" },
-  { name: "Outdoor Smart Floodlight",    brand: "Ring",       catalog:"Lighting",                   price: 89.99,  stock: 40,  description: "Motion-activated floodlight camera" },
-  { name: "Smart Desk Lamp",             brand: "Xiaomi",     catalog:"Lighting",                   price: 39.99,  stock: 75,  description: "Adjustable color temperature desk lamp" },
-  { name: "Smart Candle Light",          brand: "Philips",    catalog:"Lighting",                   price: 24.99,  stock: 110, description: "Flameless ambient candle light" },
-  { name: "Smart Night Light",           brand: "TP-Link",     catalog:"Lighting",                   price: 19.99,  stock: 130, description: "Plug-in night light with motion sensor" },
-  { name: "Smart Plug Mini",             brand: "TP-Link",     catalog:"Home Improvement",           price: 24.99,  stock: 150, description: "Compact Wi-Fi outlet adapter" },
-  { name: "Smart Dimmer Switch",         brand: "Lutron",     catalog:"Home Improvement",           price: 59.99,  stock: 70,  description: "Voice-controlled dimmer switch" },
-  { name: "Smart Garage Door Opener",    brand: "Chamberlain",catalog:"Home Improvement",           price: 149.99, stock: 30,  description: "Wi-Fi enabled garage controller" },
-  { name: "Smart Smoke Detector",        brand: "Google",     catalog:"Home Improvement",           price: 119.99, stock: 55,  description: "Carbon monoxide + smoke alarm" },
-  { name: "Smart Leak Sensor",           brand: "Honeywell",  catalog:"Home Improvement",           price: 34.99,  stock: 90,  description: "Water leak & freeze detector" },
-  { name: "Smart Light Switch Kit",      brand: "WeMo",       catalog:"Home Improvement",           price: 49.99,  stock: 65,  description: "Wi-Fi smart switch and hub kit" },
-  { name: "Video Doorbell 3",            brand: "Ring",       catalog:"Electronics",                price: 229.99, stock: 30,  description: "1080p HDR video doorbell" },
-  { name: "Wi-Fi Mesh Router",           brand: "TP-Link",     catalog:"Electronics",                price: 129.99, stock: 60,  description: "Deco mesh Wi-Fi system (3 pack)" },
-  { name: "Smart Speaker",               brand: "Amazon",     catalog:"Electronics",                price: 99.99,  stock: 100,description: "Echo Dot (5th Gen)" },
-  { name: "Smart Display",               brand: "Google",     catalog:"Electronics",                price: 149.99, stock: 45,  description: "Nest Hub with ambient EQ" },
-  { name: "Smart IR Blaster",            brand: "BroadLink",  catalog:"Electronics",                price: 39.99,  stock: 80,  description: "Universal remote control hub" },
-  { name: "Smart Air Purifier",          brand: "Levoit",     catalog:"Electronics",                price: 129.99, stock: 50,  description: "HEPA Wi-Fi air purifier" },
-  { name: "Smart Bike Light",            brand: "Garmin",     catalog:"Sports, Fitness & Outdoors",  price: 79.99,  stock: 60,  description: "Rechargeable front/rear bike light" },
-  { name: "Smart Scale",                 brand: "Withings",   catalog:"Sports, Fitness & Outdoors",  price: 129.99, stock: 40,  description: "Body composition smart scale" },
-  { name: "Smart Yoga Mat",              brand: "YogiFi",     catalog:"Sports, Fitness & Outdoors",  price: 199.99, stock: 25,  description: "Interactive workout mat" },
-  { name: "Smart Jump Rope",             brand: "Tangram",    catalog:"Sports, Fitness & Outdoors",  price: 49.99,  stock: 55,  description: "Bluetooth connected jump rope" },
+  // 1–7: Amazon (7 items)
+  { name: "Crocs Unisex Adult Classic Clog",                    brand: "Amazon",        catalog: "Clothing, Shoes & Accessories", price: 69.95,  stock: 100, description: "Classic rubber clog with pivoting heel straps",imageUrl: null,},
+  { name: "Caterpillar Men's Beanie & 5-Pack Socks",            brand: "Amazon",        catalog: "Clothing, Shoes & Accessories", price: 39.99,  stock: 120, description: "Warm cotton beanie and sock set for men",imageUrl: null ,},
+  { name: "Cabeau Evolution S3 Travel Pillow",                  brand: "Amazon",        catalog: "Clothing, Shoes & Accessories", price: 79.99,  stock: 80,  description: "Memory foam travel pillow for airplane seats",imageUrl: null, },
+  { name: "Amazon Basics Vacuum Compression Storage Bags (6-Pack)", brand: "Amazon",     catalog: "Clothing, Shoes & Accessories", price: 29.99,  stock: 200, description: "Reusable vacuum storage bags with hand pump",imageUrl: null, },
+  { name: "Portwest Radial 3 in 1 Jacket (Black, XL)",          brand: "Amazon",        catalog: "Clothing, Shoes & Accessories", price: 119.95, stock: 50,  description: "Waterproof 3-in-1 jacket with removable liner",imageUrl: null, },
+  { name: "9pcs Compression Packing Cubes Set",                 brand: "Amazon",        catalog: "Clothing, Shoes & Accessories", price: 24.99,  stock: 150, description: "Ultralight expandable packing cubes for travel",imageUrl: null, },
+  { name: "Amazon Kindle Paperwhite (16 GB) – Black",           brand: "Amazon",        catalog: "Amazon Devices & Accessories", price: 249.00, stock: 75,  description: "Glare-free e-reader with 16 GB storage",imageUrl: null, },
+
+  // 8–13: Amazon Basics (6 items)
+  { name: "Amazon Kindle (2024 release) – Matcha",              brand: "Amazon Basics", catalog: "Amazon Devices & Accessories", price: 169.00, stock: 90,  description: "Lightweight Kindle with adjustable front light",imageUrl: null, },
+  { name: "Ring Battery Video Doorbell",                        brand: "Amazon Basics", catalog: "Amazon Devices & Accessories", price: 199.00, stock: 60,  description: "Wireless security video doorbell with battery",imageUrl: null, },
+  { name: "Amazon Fire TV Stick HD",                            brand: "Amazon Basics", catalog: "Amazon Devices & Accessories", price: 49.99,  stock: 200, description: "HD streaming device with Alexa voice remote",imageUrl: null, },
+  { name: "Amazon Kindle (2024 release) – Black",               brand: "Amazon Basics", catalog: "Amazon Devices & Accessories", price: 169.00, stock: 85,  description: "Compact Kindle with glare-free display",imageUrl: null, },
+  { name: "Amazon Fire TV Stick 4K",                            brand: "Amazon Basics", catalog: "Amazon Devices & Accessories", price: 79.99,  stock: 120, description: "4K streaming device with Wi-Fi 6 support",imageUrl: null, },
+  { name: "TP-Link Tapo Smart Wi-Fi Light Bulb (E27, Multicolour, 2-Pack)", brand: "Amazon Basics", catalog: "Lighting", price: 39.99,  stock: 140, description: "Multicolour smart Wi-Fi LED light bulb with remote control",imageUrl: null, },
+
+  // 14–18: Crocs (5 items)
+  { name: "Glocusent USB Rechargeable Book Light",               brand: "Crocs",         catalog: "Lighting",                   price: 24.99,  stock: 130, description: "Clip-on rechargeable LED reading light",imageUrl: null, },
+  { name: "Dove Triple Moisturising Body Wash 1 L",             brand: "Crocs",         catalog: "Beauty",                     price: 7.50,   stock: 300, description: "Triple moisturising body wash, soap-free formula",imageUrl: null, },
+  { name: "La Roche-Posay Anthelios XL Sunscreen SPF 50+ (50 ml)", brand: "Crocs",       catalog: "Beauty",                     price: 29.95,  stock: 90,  description: "Ultra-light, water-resistant sunscreen face fluid",imageUrl: null, },
+  { name: "The Pink Stuff Miracle Cleaning Paste 850 g",         brand: "Crocs",         catalog: "Home",                       price: 12.95,  stock: 180, description: "Vegan multi-purpose household cleaning paste" ,imageUrl: null,},
+  { name: "White King Lemon Toilet Cleaner Gel 700 ml",         brand: "Crocs",         catalog: "Home",                       price: 5.99,   stock: 220, description: "Lemon-scented toilet cleaner gel with stain remover",imageUrl: null, },
+
+  // 19–23: The Pink Stuff (5 items)
+  { name: "GLASSGUARD Mould Remover Gel 300 ml",                brand: "The Pink Stuff", catalog: "Home",                      price: 9.99,   stock: 140, description: "Mould remover gel for bathroom and kitchen surfaces",imageUrl: null, },
+  { name: "The Original Scrub Daddy Cleaning Sponge",            brand: "The Pink Stuff", catalog: "Home",                      price: 6.99,   stock: 260, description: "Temperature-controlled texture cleaning sponge",imageUrl: null, },
+  { name: "Frameo Wi-Fi Digital Picture Frame 10.1″",           brand: "The Pink Stuff", catalog: "Home",                      price: 129.00, stock: 45,  description: "10.1″ HD touch-screen photo frame with 32 GB memory",imageUrl: null, },
+  { name: "The Pink Stuff Miracle Bathroom Foam Cleaner 750 ml", brand: "The Pink Stuff", catalog: "Home",                      price: 8.95,   stock: 160, description: "Vegan foaming bathroom cleaner spray",imageUrl: null, },
+  { name: "The Let Them Theory: A Life-Changing Tool",          brand: "The Pink Stuff", catalog: "Books",                     price: 24.99,  stock: 75,  description: "Self-help book offering life-changing advice",imageUrl: null, },
+
+  // 24–27: RecipeTin Eats (4 items)
+  { name: "RecipeTin Eats: Tonight (Cookbook)",                 brand: "RecipeTin Eats", catalog: "Books",                    price: 34.99,  stock: 60,  description: "Cookbook with dinner recipes for every night",imageUrl: null, },
+  { name: "Bluey: My Mum is the Best",                          brand: "RecipeTin Eats", catalog: "Books",                    price: 16.99,  stock: 120, description: "Children's book by Bluey and Bingo for Mother's Day",imageUrl: null, },
+  { name: "Easy Dinner Queen (Cookbook)",                       brand: "RecipeTin Eats", catalog: "Books",                    price: 29.99,  stock: 50,  description: "Recipe book for quick and easy dinners",imageUrl: null, },
+  { name: "RecipeTin Eats: Dinner (Cookbook)",                  brand: "RecipeTin Eats", catalog: "Books",                    price: 34.99,  stock: 65,  description: "150 recipes from Australia's most popular cook" ,imageUrl: null,},
+
+  // 28–30: Generic (3 items)
+  { name: "Sunrise on the Reaping (Hunger Games)",              brand: "Generic",       catalog: "Books",                     price: 19.99,  stock: 90,  description: "Prequel novel in the Hunger Games series",imageUrl: null, },
+  { name: "Amazon Basics Digital Kitchen Scale",                brand: "Generic",       catalog: "Household Appliances",     price: 17.90,  stock: 210, description: "Digital kitchen scale with LCD display, up to 4.9 kg",imageUrl: null, },
+  { name: "Paula's Choice Skin Perfecting 2% BHA Liquid Exfoliant", brand: "Generic",    catalog: "Beauty",                    price: 56.00,  stock: 80,  description: "Liquid exfoliant with 2% salicylic acid for pores",imageUrl: null, }
 ];
+
+
+
+
 
 (async () => {
   try {

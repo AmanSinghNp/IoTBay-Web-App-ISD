@@ -1,42 +1,119 @@
-<%- include('partials/header') %>
 
-<div class="min-h-screen flex flex-col">
-  <main class="flex-grow py-12">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h1 class="text-3xl font-bold mb-6">Your Cart</h1>
 
-      <% if (!cartItems.length) { %>
-        <p class="text-gray-600">
-          Your cart is empty.
-          <a href="/devices" class="text-blue-600">Browse devices &rarr;</a>
-        </p>
-      <% } else { %>
-        <ul class="space-y-4">
-          <% cartItems.forEach(item => { %>
-            <li class="flex justify-between items-center bg-white shadow rounded p-4">
-              <div class="flex items-center space-x-4">
-                <% if (item.Device.imageUrl) { %>
-                  <img src="<%= item.Device.imageUrl %>"
-                       class="w-16 h-16 object-cover rounded" />
-                <% } %>
-                <div>
-                  <h2 class="font-semibold text-lg"><%= item.Device.name %></h2>
-                  <p>Qty: <%= item.quantity %></p>
-                  <p>Unit price: $<%= item.Device.price.toFixed(2) %></p>
-                </div>
-              </div>
-              <form action="/cart/remove/<%= item.id %>" method="POST"
-                    onsubmit="return confirm('Remove this item and restore stock?');">
-                <button type="submit"
-                        class="bg-red-600 text-white py-1 px-4 rounded hover:bg-red-700">
-                  Remove
-                </button>
-              </form>
-            </li>
-          <% }) %>
-        </ul>
-      <% } %>
+<body class="min-h-screen flex flex-col">
+  <%- include('partials/header') %>
+  <main class="flex-grow">
+
+
+<div class="relative">
+  <!-- Continue Shopping (absolute) -->
+  <a href="/devices" class="absolute top-4 left-4 text-blue-600 hover:underline font-medium">
+     Continue Shopping
+  </a>
+
+
+
+<section class="bg-gray-100 py-6">
+  <div class="max-w-4xl mx-auto px-4">
+    <!-- Step Indicator -->
+    <div class="flex items-center mb-8">
+      <div class="flex-1 text-center">
+        <div class="font-semibold">1. Cart</div>
+        <div class="h-1 bg-blue-600 rounded-full mt-2"></div>
+      </div>
+      <div class="flex-1 text-center">
+        <div class="font-semibold text-gray-500">2. Delivery</div>
+        <div class="h-1 bg-gray-300 rounded-full mt-2"></div>
+      </div>
+      <div class="flex-1 text-center">
+        <div class="font-semibold text-gray-500">3. Payment</div>
+        <div class="h-1 bg-gray-300 rounded-full mt-2"></div>
+      </div>
     </div>
-  </main>
-  <%- include('partials/footer') %>
-</div>
+
+    <!-- Cart Content -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+      <!-- LEFT: Cart Details -->
+      <div class="bg-white rounded-lg shadow p-6 flex flex-col justify-between relative">
+        <!-- Edit Cart Toggle -->
+        <button id="toggle-edit-btn" class="absolute top-4 right-4 text-blue-600 hover:underline font-medium">
+          Edit Cart
+        </button>
+
+        <div id="cart-items-container">
+          <% if (!cartItems.length) { %>
+            <p class="text-gray-600">
+              Your cart is empty.
+              <a href="/devices" class="text-blue-600 hover:underline">Browse devices &rarr;</a>
+            </p>
+          <% } else { %>
+            <% cartItems.forEach(item => { %>
+              <div class="flex justify-between items-start space-x-4 mb-4">
+                <div class="flex items-start space-x-4">
+                  <% if (item.Device.imageUrl) { %>
+                    <img src="<%= item.Device.imageUrl %>" alt="<%= item.Device.name %>" class="w-16 h-16 object-cover rounded" />
+                  <% } %>
+                  <div class="flex-1">
+                    <h2 class="font-semibold"><%= item.Device.name %></h2>
+                    <p class="text-sm text-gray-500">Qty <%= item.quantity %></p>
+                    <p class="text-sm text-gray-700">
+                      $<%= (item.Device.price * item.quantity).toFixed(2) %>
+                    </p>
+                  </div>
+                </div>
+                <!-- Remove Button -->
+                <form action="/cart/remove/<%= item.id %>" method="POST" class="remove-btn mt-2">
+                  <button type="submit" class="text-red-600 hover:text-red-800 font-medium" onclick="return confirm('Remove this item from cart?');">
+                    Remove
+                  </button>
+                </form>
+              </div>
+              <hr class="my-2" />
+            <% }) %>
+          <% } %>
+        </div>
+
+        <!-- Total & Continue -->
+        <div class="mt-4">
+          <div class="flex justify-between font-semibold text-lg">
+            <span>Total</span>
+            <span>$<%= cartItems.reduce((sum, item) => sum + item.Device.price * item.quantity, 0).toFixed(2) %></span>
+          </div>
+          <a href="/delivery" id="continue-btn" class="mt-4 block text-center py-2 rounded <%= cartItems.length ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-400 text-gray-700 cursor-not-allowed' %>" <%= cartItems.length ? '' : 'aria-disabled="true"' %>>
+            Continue
+          </a>
+        </div>
+      </div>
+
+      <!-- RIGHT: Placeholder for Next Steps -->
+      <div></div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    const toggleBtn = document.getElementById('toggle-edit-btn');
+    const removeBtns = document.querySelectorAll('.remove-btn');
+    let editing = false;
+    function updateRemoveButtons() {
+      removeBtns.forEach(btn => {
+        btn.style.display = editing ? 'block' : 'none';
+      });
+      toggleBtn.textContent = editing ? 'Done Editing' : 'Edit Cart';
+    }
+    toggleBtn.addEventListener('click', () => {
+      editing = !editing;
+      updateRemoveButtons();
+    });
+    // initialize: hide remove buttons
+    updateRemoveButtons();
+  })();
+</script>
+
+
+
+ </main>
+<%- include('partials/footer') %>
+</body>

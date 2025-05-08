@@ -7,8 +7,6 @@ const User = require("./models/user");
 const Device = require("./models/device");
 const Order = require("./models/order");
 const Payment = require("./models/payment");
-
-
 const Cart   = require('./models/cart');
 
 
@@ -25,6 +23,7 @@ const deviceRoutes = require("./routes/devices");
 const orderRoutes = require("./routes/orders");
 const paymentRoutes = require("./routes/payments");
 const userRoutes = require("./routes/user");
+const deliveryRoutes = require('./routes/delivery');
 
 
 const productRoutes = require("./routes/product"); 
@@ -87,11 +86,13 @@ app.use("/", paymentRoutes);
 app.use("/", userRoutes);
 app.use("/", cartRoutes); // Cart routes
 app.use("/", productRoutes); 
+app.use('/', deliveryRoutes); // Delivery routes
 
 // Home route
 app.get("/", (req, res) => {
   res.render("index");
 });
+
 
 // Protected dashboard
 app.get("/dashboard", (req, res) => {

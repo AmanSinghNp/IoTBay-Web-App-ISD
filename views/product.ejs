@@ -1,12 +1,20 @@
 <%- include('partials/header') %>
 
-<% if (flash) { %>
-  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-    <div class="p-4 rounded <%= flash.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
-      <%= flash.message %>
+<!-- Product Page Container -->
+<div class="relative">
+  <!-- Continue Shopping (absolute) -->
+  <a href="/devices" class="absolute top-4 left-4 text-blue-600 hover:underline font-medium">
+    &larr; Continue Shopping
+  </a>
+
+  <% if (flash) { %>
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+      <div class="p-4 rounded <%= flash.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
+        <%= flash.message %>
+      </div>
     </div>
-  </div>
-<% } %>
+  <% } %>
+</div>
 
 <div class="min-h-screen flex flex-col">
   <main class="flex-grow">
@@ -40,37 +48,39 @@
         <div class="bg-white p-8 rounded-lg shadow-lg space-y-6">
           <h2 class="text-xl font-semibold">Your Cart</h2>
 
-          <% if (product.stock > 0) { %>
-            <p class="text-green-600 font-medium">In Stock</p>
+          <!-- Stock Status -->
+          <p class="font-medium <%= product.stock > 0 ? 'text-green-600' : 'text-red-500' %>">
+            <%= product.stock > 0 ? 'In Stock' : 'Out of Stock' %>
+          </p>
 
-            <form action="/cart/add" method="POST" class="space-y-4">
-              <input type="hidden" name="productId" value="<%= product.id %>" />
+          <!-- Quantity & Add to Cart -->
+          <form action="/cart/add" method="POST" class="space-y-4">
+            <input type="hidden" name="productId" value="<%= product.id %>" />
 
-              <div>
-                <label for="quantity" class="block mb-1 font-medium">Quantity:</label>
-                <select name="quantity" id="quantity" class="border rounded w-full p-2">
-                  <% for (let i = 1; i <= Math.min(product.stock, 10); i++) { %>
-                    <option value="<%= i %>"><%= i %></option>
-                  <% } %>
-                </select>
-              </div>
-
-              <button type="submit"
-                class="w-full bg-yellow-500 text-white py-3 rounded hover:bg-yellow-600 transition">
-                Add to Cart
-              </button>
-            </form>
-
-            <div class="mt-4 text-center">
-              <a href="/cart"
-                 class="inline-block bg-blue-600 text-white py-2 px-6 rounded hover:bg-blue-700">
-                Show Cart
-              </a>
+            <div>
+              <label for="quantity" class="block mb-1 font-medium">Quantity:</label>
+              <select name="quantity" id="quantity" class="border rounded w-full p-2">
+                <% for (let i = 1; i <= Math.min(product.stock, 10); i++) { %>
+                  <option value="<%= i %>"><%= i %></option>
+                <% } %>
+              </select>
             </div>
 
-          <% } else { %>
-            <p class="text-red-500 font-medium">Out of Stock</p>
-          <% } %>
+            <button
+              type="submit"
+              class="w-full py-3 rounded transition <%= product.stock > 0 ? 'bg-yellow-500 text-white hover:bg-yellow-600' : 'bg-gray-400 text-gray-700 cursor-not-allowed' %>"
+              <%= product.stock > 0 ? '' : 'disabled' %>
+            >
+              Add to Cart
+            </button>
+          </form>
+
+          <!-- Show Cart Button -->
+          <div class="mt-4 text-center">
+            <a href="/cart" class="inline-block bg-blue-600 text-white py-2 px-6 rounded hover:bg-blue-700">
+              Show Cart
+            </a>
+          </div>
         </div>
 
       </div>

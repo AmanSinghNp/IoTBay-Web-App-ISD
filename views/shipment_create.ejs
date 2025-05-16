@@ -1,0 +1,27 @@
+<%- include('partials/header') %>
+<h2>Create Shipment</h2>
+
+<form action="/shipment/create" method="POST">
+  <label for="orderId">Order ID:</label><br>
+  <input type="number" name="orderId" required><br><br>
+
+  <label for="method">Shipping Method:</label><br>
+  <input type="text" name="method" required><br><br>
+
+  <!-- ✅ Dropdown for selecting a saved address -->
+  <label for="addressId">Select Address:</label><br>
+  <select name="addressId" required>
+    <% addresses.forEach(addr => { %>
+      <option value="<%= addr.id %>">
+        <%= addr.label %> – <%= addr.street %>, <%= addr.city %>
+      </option>
+    <% }) %>
+  </select><br><br>
+
+  <label for="shipmentDate">Shipment Date:</label><br>
+  <input type="date" name="shipmentDate" required><br><br>
+
+  <button type="submit">Create Shipment</button>
+</form>
+
+<%- include('partials/footer') %>

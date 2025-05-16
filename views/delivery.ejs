@@ -78,7 +78,53 @@
         <h1 class="text-2xl font-bold mb-4">Delivery Page</h1>
         <p class="text-gray-600">Implement your code in delivery.js</p>
 
+        <!-- 🟦 INSERTED: Show existing saved addresses -->
+        <h2 class="text-xl font-semibold mb-2">Your Saved Addresses</h2>
+        <% if (addresses.length === 0) { %>
+          <p class="text-gray-500 mb-4">No saved addresses yet.</p>
+        <% } else { %>
+          <ul class="mb-4 space-y-2">
+            <% addresses.forEach(address => { %>
+              <li class="border p-3 rounded">
+                <b><%= address.label %></b><br>
+                <%= address.street %>, <%= address.city %>, <%= address.postcode %>, <%= address.country %><br>
+                <form action="/address/delete/<%= address.id %>" method="POST" style="display:inline;">
+                  <button type="submit" class="text-red-600 hover:text-red-800 text-sm" onclick="return confirm('Delete this address?')">Delete</button>
+                </form>
+                <a href="/address/edit/<%= address.id %>" class="ml-2 text-blue-600 text-sm hover:underline">Edit</a>
+              </li>
+            <% }) %>
+          </ul>
+        <% } %>
 
+                <!-- 🟦 INSERTED: Address creation form -->
+        <h3 class="text-lg font-semibold mb-2">Add New Address</h3>
+        <form action="/address/add" method="POST" class="space-y-2">
+          <input type="hidden" name="userId" value="<%= userId %>">
+          <div>
+            <label class="block text-sm">Label</label>
+            <input type="text" name="label" required class="w-full border px-2 py-1 rounded">
+          </div>
+          <div>
+            <label class="block text-sm">Street</label>
+            <input type="text" name="street" required class="w-full border px-2 py-1 rounded">
+          </div>
+          <div>
+            <label class="block text-sm">City</label>
+            <input type="text" name="city" required class="w-full border px-2 py-1 rounded">
+          </div>
+          <div>
+            <label class="block text-sm">Postcode</label>
+            <input type="text" name="postcode" required class="w-full border px-2 py-1 rounded">
+          </div>
+          <div>
+            <label class="block text-sm">Country</label>
+            <input type="text" name="country" required class="w-full border px-2 py-1 rounded">
+          </div>
+          <button type="submit" class="mt-2 bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700">Add Address</button>
+        </form>
+
+        
          <!-- Total & Continue -->
          <div class="mt-4">
           <div class="flex justify-between font-semibold text-lg">

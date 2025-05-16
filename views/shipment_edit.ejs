@@ -1,0 +1,44 @@
+<%- include('partials/header') %>
+
+<div class="max-w-xl mx-auto mt-10 bg-white p-6 rounded shadow">
+  <h2 class="text-2xl font-bold mb-4">Edit Shipment</h2>
+
+  <form action="/shipment/edit/<%= shipment.id %>" method="POST" class="space-y-4">
+    <p><strong>Shipment ID:</strong> <%= shipment.id %></p>
+    <p><strong>Order ID:</strong> <%= shipment.orderId %></p>
+
+    <!-- Shipping Method -->
+    <div>
+      <label class="block text-sm font-medium">Shipping Method</label>
+      <input type="text" name="method" value="<%= shipment.method %>" required class="w-full border px-3 py-2 rounded" />
+    </div>
+
+    <!-- Shipment Date -->
+    <div>
+      <label class="block text-sm font-medium">Shipment Date</label>
+      <input type="date" name="shipmentDate" value="<%= shipment.shipmentDate %>" required class="w-full border px-3 py-2 rounded" />
+    </div>
+
+    <!-- Address Dropdown -->
+    <div>
+      <label class="block text-sm font-medium">Select Address</label>
+      <select name="addressId" required class="w-full border px-3 py-2 rounded">
+        <% addresses.forEach(addr => { %>
+          <option value="<%= addr.id %>" <%= addr.id === shipment.addressId ? "selected" : "" %>>
+            <%= addr.label %> — <%= addr.street %>, <%= addr.city %>
+          </option>
+        <% }) %>
+      </select>
+    </div>
+
+    <!-- Submit -->
+    <div class="flex justify-between mt-6">
+      <a href="/shipment/view" class="text-blue-600 hover:underline">← Cancel</a>
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        Save Changes
+      </button>
+    </div>
+  </form>
+</div>
+
+<%- include('partials/footer') %>

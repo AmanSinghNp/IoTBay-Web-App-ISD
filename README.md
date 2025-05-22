@@ -113,3 +113,4 @@ The application includes two pre-seeded users for testing:
 You can log in using the `/login` page on the site.
 
 To create more users, register from the `/register` page. New accounts are customer role by default.
+1

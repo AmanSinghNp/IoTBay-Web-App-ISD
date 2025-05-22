@@ -2,13 +2,15 @@
 const Order = require("../models/order");
 const Device = require("../models/device");
 
-// View list of customer's orders
+// Shows all orders for the logged-in customer
 exports.viewOrders = async (req, res) => {
+  // Check if user is logged in
   if (!req.session.userId) {
     return res.redirect("/login");
   }
 
   try {
+    // Get all orders for this user, newest first
     const orders = await Order.findAll({
       where: { userId: req.session.userId },
       include: [Device], // Include device details
@@ -25,8 +27,9 @@ exports.viewOrders = async (req, res) => {
 // Show form to create a new order (optional, or can do inline)
 // Not necessary if orders are placed directly from devices
 
-// Place a new order
+// Creates a new order for a device
 exports.createOrder = async (req, res) => {
+  // Check if user is logged in
   if (!req.session.userId) {
     return res.redirect("/login");
   }
@@ -34,13 +37,14 @@ exports.createOrder = async (req, res) => {
   const { deviceId, quantity } = req.body;
 
   try {
+    // Check if device exists and has enough stock
     const device = await Device.findByPk(deviceId);
 
     if (!device || device.stock < quantity) {
       return res.send("Device not available or insufficient stock.");
     }
 
-    // Create order
+    // Save the order in database
     await Order.create({
       userId: req.session.userId,
       deviceId: device.id,
@@ -48,7 +52,7 @@ exports.createOrder = async (req, res) => {
       status: "Placed",
     });
 
-    // Decrease device stock
+    // Update the device stock
     device.stock -= quantity;
     await device.save();
 
@@ -59,8 +63,9 @@ exports.createOrder = async (req, res) => {
   }
 };
 
-// Cancel an existing order (before final submission)
+// Cancels an order and returns items to stock
 exports.cancelOrder = async (req, res) => {
+  // Check if user is logged in
   if (!req.session.userId) {
     return res.redirect("/login");
   }
@@ -68,17 +73,19 @@ exports.cancelOrder = async (req, res) => {
   const orderId = req.params.id;
 
   try {
+    // Find the order and check if it belongs to this user
     const order = await Order.findByPk(orderId);
 
     if (!order || order.userId !== req.session.userId) {
       return res.status(403).send("Unauthorized.");
     }
 
+    // Only cancel if order is in 'Placed' status
     if (order.status === "Placed") {
       order.status = "Cancelled";
       await order.save();
 
-      // Refund device stock
+      // Put items back in stock
       const device = await Device.findByPk(order.deviceId);
       if (device) {
         device.stock += order.quantity;
@@ -93,8 +100,9 @@ exports.cancelOrder = async (req, res) => {
   }
 };
 
-// (Optional) Update order before final submit — basic version
+// Updates quantity of items in an order
 exports.updateOrder = async (req, res) => {
+  // Check if user is logged in
   if (!req.session.userId) {
     return res.redirect("/login");
   }
@@ -103,12 +111,14 @@ exports.updateOrder = async (req, res) => {
   const orderId = req.params.id;
 
   try {
+    // Find order and check if it belongs to this user
     const order = await Order.findByPk(orderId);
 
     if (!order || order.userId !== req.session.userId) {
       return res.status(403).send("Unauthorized.");
     }
 
+    // Can only update orders that are just placed
     if (order.status !== "Placed") {
       return res.send("Cannot update a finalized order.");
     }
@@ -119,12 +129,12 @@ exports.updateOrder = async (req, res) => {
       return res.send("Device not found.");
     }
 
-    // Adjust stock
+    // Update stock based on quantity change
     const stockChange = order.quantity - quantity;
     device.stock += stockChange;
     await device.save();
 
-    // Update order
+    // Save new quantity
     order.quantity = quantity;
     await order.save();
 
@@ -135,17 +145,20 @@ exports.updateOrder = async (req, res) => {
   }
 };
 
-// View single order details
+// Shows detailed information about a single order
 exports.viewOrderDetails = async (req, res) => {
+  // Check if user is logged in
   if (!req.session.userId) return res.redirect("/login");
 
   const orderId = req.params.id;
 
   try {
+    // Get order with device details
     const order = await Order.findByPk(orderId, {
       include: [Device],
     });
 
+    // Check if order exists and belongs to this user
     if (!order || order.userId !== req.session.userId) {
       return res.status(403).send("Unauthorized or order not found.");
     }

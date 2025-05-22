@@ -376,7 +376,7 @@ const dummyUsers = [
   {
     fullName: "Admin User",
     email: "admin@iotbay.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000000",
     role: "admin",
     status: "active",
@@ -384,7 +384,7 @@ const dummyUsers = [
   {
     fullName: "Staff One",
     email: "staff1@iotbay.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000001",
     role: "staff",
     status: "active",
@@ -392,7 +392,7 @@ const dummyUsers = [
   {
     fullName: "Staff Two",
     email: "staff2@iotbay.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000002",
     role: "staff",
     status: "active",
@@ -400,7 +400,7 @@ const dummyUsers = [
   {
     fullName: "Staff Three",
     email: "staff3@iotbay.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000003",
     role: "staff",
     status: "active",
@@ -408,7 +408,7 @@ const dummyUsers = [
   {
     fullName: "Staff Four",
     email: "staff4@iotbay.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000004",
     role: "staff",
     status: "active",
@@ -416,7 +416,7 @@ const dummyUsers = [
   {
     fullName: "Staff Five",
     email: "staff5@iotbay.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000005",
     role: "staff",
     status: "active",
@@ -424,7 +424,7 @@ const dummyUsers = [
   {
     fullName: "Staff Six",
     email: "staff6@iotbay.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000006",
     role: "staff",
     status: "active",
@@ -432,7 +432,7 @@ const dummyUsers = [
   {
     fullName: "Staff Seven",
     email: "staff7@iotbay.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000007",
     role: "staff",
     status: "active",
@@ -440,7 +440,7 @@ const dummyUsers = [
   {
     fullName: "Staff Eight",
     email: "staff8@iotbay.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000008",
     role: "staff",
     status: "active",
@@ -448,7 +448,7 @@ const dummyUsers = [
   {
     fullName: "Staff Nine",
     email: "staff9@iotbay.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000009",
     role: "staff",
     status: "active",
@@ -458,7 +458,7 @@ const dummyUsers = [
   {
     fullName: "John Customer",
     email: "john@example.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000020",
     role: "customer",
     status: "active",
@@ -466,7 +466,7 @@ const dummyUsers = [
   {
     fullName: "Jane Smith",
     email: "jane@example.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000021",
     role: "customer",
     status: "active",
@@ -474,7 +474,7 @@ const dummyUsers = [
   {
     fullName: "Bob Wilson",
     email: "bob@example.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000022",
     role: "customer",
     status: "active",
@@ -482,7 +482,7 @@ const dummyUsers = [
   {
     fullName: "Alice Brown",
     email: "alice@example.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000023",
     role: "customer",
     status: "active",
@@ -490,7 +490,7 @@ const dummyUsers = [
   {
     fullName: "Charlie Davis",
     email: "charlie@example.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000024",
     role: "customer",
     status: "active",
@@ -498,7 +498,7 @@ const dummyUsers = [
   {
     fullName: "Diana Evans",
     email: "diana@example.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000025",
     role: "customer",
     status: "active",
@@ -506,7 +506,7 @@ const dummyUsers = [
   {
     fullName: "Edward Foster",
     email: "edward@example.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000026",
     role: "customer",
     status: "active",
@@ -514,7 +514,7 @@ const dummyUsers = [
   {
     fullName: "Grace Harris",
     email: "grace@example.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000027",
     role: "customer",
     status: "active",
@@ -522,7 +522,7 @@ const dummyUsers = [
   {
     fullName: "Henry Irving",
     email: "henry@example.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000028",
     role: "customer",
     status: "active",
@@ -530,7 +530,7 @@ const dummyUsers = [
   {
     fullName: "Isabel James",
     email: "isabel@example.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000029",
     role: "customer",
     status: "active",
@@ -538,7 +538,7 @@ const dummyUsers = [
   {
     fullName: "Jack Kennedy",
     email: "jack@example.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000030",
     role: "customer",
     status: "active",
@@ -546,7 +546,7 @@ const dummyUsers = [
   {
     fullName: "Kelly Lewis",
     email: "kelly@example.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000031",
     role: "customer",
     status: "active",
@@ -554,7 +554,7 @@ const dummyUsers = [
   {
     fullName: "Liam Martin",
     email: "liam@example.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000032",
     role: "customer",
     status: "active",
@@ -562,7 +562,7 @@ const dummyUsers = [
   {
     fullName: "Mia Nelson",
     email: "mia@example.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000033",
     role: "customer",
     status: "active",
@@ -570,7 +570,7 @@ const dummyUsers = [
   {
     fullName: "Noah Oliver",
     email: "noah@example.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000034",
     role: "customer",
     status: "active",
@@ -578,7 +578,7 @@ const dummyUsers = [
   {
     fullName: "Olivia Parker",
     email: "olivia@example.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000035",
     role: "customer",
     status: "active",
@@ -586,7 +586,7 @@ const dummyUsers = [
   {
     fullName: "Peter Quinn",
     email: "peter@example.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000036",
     role: "customer",
     status: "active",
@@ -594,7 +594,7 @@ const dummyUsers = [
   {
     fullName: "Rachel Roberts",
     email: "rachel@example.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000037",
     role: "customer",
     status: "active",
@@ -602,7 +602,7 @@ const dummyUsers = [
   {
     fullName: "Samuel Scott",
     email: "samuel@example.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000038",
     role: "customer",
     status: "active",
@@ -610,7 +610,7 @@ const dummyUsers = [
   {
     fullName: "Tara Thompson",
     email: "tara@example.com",
-    password: "$2b$10$YourHashedPasswordHere",
+    password: "$2b$10$zFr1gqfbKib9jqx5AN8qPuEYAhYvZpwQOGz2ZtxjgJOWsK2YM5bEi",
     phone: "0400000039",
     role: "customer",
     status: "active",

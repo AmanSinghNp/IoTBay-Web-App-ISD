@@ -112,26 +112,25 @@ IoTBay-Web-App-ISD/
 
 ## 🔐 Test Accounts
 
-The application includes pre-seeded users for testing:
+The application includes pre-seeded users for testing. All accounts use the same password for testing purposes:
+
+**Default Password for all accounts**: `Password123!`
 
 ### Admin User
 
 - **Email**: admin@iotbay.com
-- **Password**: $2b$10$YourHashedPasswordHere
 - **Role**: Admin
 - Full system access
 
 ### Staff User
 
 - **Email**: staff1@iotbay.com
-- **Password**: $2b$10$YourHashedPasswordHere
 - **Role**: Staff
 - Can manage products and view user data
 
 ### Customer User
 
 - **Email**: john@example.com
-- **Password**: $2b$10$YourHashedPasswordHere
 - **Role**: Customer
 - Can browse products, place orders, and manage payments
 

@@ -1,16 +1,19 @@
+// Handles user operations like profile management and access logs
 const User = require("../models/user");
 const Order = require("../models/order");
 const UserAccessLog = require("../models/userAccessLog");
 const { Op } = require("sequelize");
 
-// Show the profile page
+// Display user's profile page
 exports.showProfile = async (req, res) => {
   if (!req.session.userId) return res.redirect("/login");
 
   try {
+    // Get user details
     const user = await User.findByPk(req.session.userId);
     if (!user) return res.redirect("/login");
 
+    // Show profile page with any messages
     return res.render("profile", {
       user,
       successMessage: req.session.successMessage || null,
@@ -20,24 +23,28 @@ exports.showProfile = async (req, res) => {
     console.error("Error loading profile:", err);
     return res.status(500).send("Error loading profile.");
   } finally {
+    // Clear any displayed messages
     req.session.successMessage = null;
     req.session.errorMessage = null;
   }
 };
 
-// Update profile
+// Save changes to user's profile
 exports.updateProfile = async (req, res) => {
   const { fullName, email, phone } = req.body;
 
   try {
+    // Find and update user
     const user = await User.findByPk(req.session.userId);
     if (!user) return res.redirect("/login");
 
+    // Save new details
     user.fullName = fullName;
     user.email = email;
     user.phone = phone;
     await user.save();
 
+    // Update session name
     req.session.userName = fullName;
 
     return res.render("profile", {
@@ -55,21 +62,21 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// Delete account and cancel placed orders
+// Remove user account and clean up their data
 exports.deleteAccount = async (req, res) => {
   const userId = req.session.userId;
 
   try {
-    // Cancel all placed orders for user
+    // Cancel any pending orders
     await Order.update(
       { status: "Cancelled" },
       { where: { userId, status: "Placed" } }
     );
 
-    // Delete user
+    // Remove user from database
     await User.destroy({ where: { id: userId } });
 
-    // End session and show success message on login
+    // Log out and show confirmation
     req.session.destroy(() => {
       return res.redirect("/login?deleted=1");
     });
@@ -79,17 +86,19 @@ exports.deleteAccount = async (req, res) => {
   }
 };
 
-// Dashboard view with access log summary
+// Show user's dashboard with recent activity
 exports.showDashboard = async (req, res) => {
   if (!req.session.userId) return res.redirect("/login");
 
   try {
+    // Get recent login history
     const logs = await UserAccessLog.findAll({
       where: { userId: req.session.userId },
       order: [["loginTime", "DESC"]],
       limit: 5,
     });
 
+    // Calculate login stats
     const lastLogin = logs[0]?.loginTime || null;
     const sessionCount = logs.length;
 
@@ -105,17 +114,18 @@ exports.showDashboard = async (req, res) => {
   }
 };
 
-// View user access logs with optional date filtering
+// Show user's login history with date filter
 exports.viewAccessLogs = async (req, res) => {
   if (!req.session.userId) return res.redirect("/login");
 
   const { date } = req.query;
   const where = { userId: req.session.userId };
 
+  // Add date filter if provided
   if (date) {
     const start = new Date(date);
     const end = new Date(date);
-    end.setDate(end.getDate() + 1); // Include logs up to next day's midnight
+    end.setDate(end.getDate() + 1); // Include full day
 
     where.loginTime = {
       [Op.gte]: start,
@@ -124,6 +134,7 @@ exports.viewAccessLogs = async (req, res) => {
   }
 
   try {
+    // Get filtered login history
     const logs = await UserAccessLog.findAll({
       where,
       order: [["loginTime", "DESC"]],

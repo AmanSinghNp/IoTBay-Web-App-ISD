@@ -1,9 +1,11 @@
+// Handles user authentication like login, register, and logout
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const UserAccessLog = require("../models/userAccessLog");
 
-// Show login page
+// Display the login page
 exports.getLogin = (req, res) => {
+  // Show success message if account was deleted
   const successMessage =
     req.query.deleted === "1"
       ? "Your account has been successfully deleted."
@@ -15,11 +17,12 @@ exports.getLogin = (req, res) => {
   });
 };
 
-// Handle login form
+// Process login attempt
 exports.postLogin = async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    // Check if user exists
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
@@ -29,15 +32,16 @@ exports.postLogin = async (req, res) => {
       });
     }
 
+    // Check if password matches
     const match = await bcrypt.compare(password, user.password);
 
     if (match) {
-      // Save session data
+      // Store user info in session
       req.session.userId = user.id;
       req.session.userName = user.fullName;
       req.session.userRole = user.role;
 
-      // Create login record
+      // Log the login attempt
       const accessLog = await UserAccessLog.create({
         userId: user.id,
         loginTime: new Date(),
@@ -61,18 +65,20 @@ exports.postLogin = async (req, res) => {
   }
 };
 
-// Show register page
+// Display the registration page
 exports.getRegister = (req, res) => {
   res.render("register", { error: null });
 };
 
-// Handle register form
+// Process new user registration
 exports.postRegister = async (req, res) => {
   const { fullName, email, phone, password } = req.body;
 
   try {
+    // Hash the password
     const hash = await bcrypt.hash(password, 10);
 
+    // Create new user account
     await User.create({
       fullName,
       email,
@@ -90,9 +96,10 @@ exports.postRegister = async (req, res) => {
   }
 };
 
-// Logout user
+// Log out the user
 exports.logout = async (req, res) => {
   try {
+    // Record logout time
     if (req.session.accessLogId) {
       const accessLog = await UserAccessLog.findByPk(req.session.accessLogId);
       if (accessLog) {
@@ -101,6 +108,7 @@ exports.logout = async (req, res) => {
       }
     }
 
+    // Clear session
     req.session.destroy();
     res.redirect("/");
   } catch (err) {

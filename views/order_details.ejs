@@ -27,6 +27,26 @@
       </li>
     </ul>
 
+    <% if (order.Payment) { %>
+    <div class="mt-4 p-4 bg-blue-50 rounded">
+      <h3 class="font-semibold mb-2">Payment Info</h3>
+      <p><strong>Method:</strong> <%= order.Payment.paymentMethod %></p>
+      <p><strong>Status:</strong> <%= order.Payment.status %></p>
+      <p><strong>Amount:</strong> $<%= order.Payment.amount.toFixed(2) %></p>
+      <p><strong>Transaction ID:</strong> <%= order.Payment.transactionId %></p>
+    </div>
+    <% } %> <% if (order.Shipment) { %>
+    <div class="mt-4 p-4 bg-green-50 rounded">
+      <h3 class="font-semibold mb-2">Shipment Info</h3>
+      <p><strong>Method:</strong> <%= order.Shipment.method %></p>
+      <p><strong>Date:</strong> <%= order.Shipment.shipmentDate %></p>
+      <p>
+        <strong>Finalised:</strong> <%= order.Shipment.finalised ? 'Yes' : 'No'
+        %>
+      </p>
+    </div>
+    <% } %>
+
     <div class="mt-6 flex justify-between">
       <a href="/orders" class="text-blue-600 hover:underline"
         >← Back to Orders</a

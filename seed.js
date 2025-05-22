@@ -1,6 +1,14 @@
 // seed.js
 const sequelize = require("./config/database");
 const Device = require("./models/device");
+const User = require("./models/user");
+const Order = require("./models/order");
+const Payment = require("./models/payment");
+const UserAccessLog = require("./models/userAccessLog");
+const Shipment = require("./models/shipment");
+const Address = require("./models/address");
+const Cart = require("./models/cart");
+const bcrypt = require("bcrypt");
 
 const dummyDevices = [
   // 1–7: Amazon (7 items)
@@ -18,18 +26,20 @@ const dummyDevices = [
     name: "Apple iPhone 14 Pro",
     brand: "Apple",
     catalog: "Electronics, Mobile Phones",
-    price: 1199.00,
+    price: 1199.0,
     stock: 50,
-    description: "6.1-inch Super Retina XDR display, A16 Bionic chip, and Pro camera system.",
-    imageUrl:"/images/iphone14pro.jpg",
+    description:
+      "6.1-inch Super Retina XDR display, A16 Bionic chip, and Pro camera system.",
+    imageUrl: "/images/iphone14pro.jpg",
   },
   {
     name: "Apple MacBook Air",
     brand: "Apple",
     catalog: "Electronics, Computers & Accessories",
-    price: 999.00,
+    price: 999.0,
     stock: 30,
-    description: "M2 chip, 8 GB RAM, 256 GB SSD, 13.6-inch Liquid Retina display, fan-less design.",
+    description:
+      "M2 chip, 8 GB RAM, 256 GB SSD, 13.6-inch Liquid Retina display, fan-less design.",
     imageUrl: "/images/MacBookAir.jpg",
   },
   {
@@ -38,8 +48,9 @@ const dummyDevices = [
     catalog: "Electronics, Computers & Accessories",
     price: 549.99,
     stock: 75,
-    description: "15.6-inch Full HD display, Intel Core i5-1135G7, 8 GB RAM, 256 GB SSD, backlit keyboard.",
-    imageUrl:"/images/Acer_Aspire.jpg",
+    description:
+      "15.6-inch Full HD display, Intel Core i5-1135G7, 8 GB RAM, 256 GB SSD, backlit keyboard.",
+    imageUrl: "/images/Acer_Aspire.jpg",
   },
   {
     name: "Asus ROG Phone 6",
@@ -47,7 +58,8 @@ const dummyDevices = [
     catalog: "Electronics, Mobile Phones",
     price: 999.99,
     stock: 40,
-    description: "Snapdragon 8+ Gen 1, 6.78-inch 165 Hz AMOLED display, AirTrigger 5 gaming controls.",
+    description:
+      "Snapdragon 8+ Gen 1, 6.78-inch 165 Hz AMOLED display, AirTrigger 5 gaming controls.",
     imageUrl: "/images/Asus_ROG_phone.jpg",
   },
   {
@@ -56,7 +68,8 @@ const dummyDevices = [
     catalog: "Electronics, Computers & Accessories",
     price: 849.99,
     stock: 25,
-    description: "14-inch Full HD OLED display, Intel Evo platform, 16 GB RAM, 512 GB SSD, ultralight chassis.",
+    description:
+      "14-inch Full HD OLED display, Intel Evo platform, 16 GB RAM, 512 GB SSD, ultralight chassis.",
     imageUrl: "/images/Asus_ZenBook.jpg",
   },
   {
@@ -65,7 +78,8 @@ const dummyDevices = [
     catalog: "Electronics, Tablets",
     price: 149.99,
     stock: 120,
-    description: "10.1-inch 1080p Full HD display, 3 GB RAM, 32 GB storage (expandable), up to 12 hrs battery.",
+    description:
+      "10.1-inch 1080p Full HD display, 3 GB RAM, 32 GB storage (expandable), up to 12 hrs battery.",
     imageUrl: "/images/Amazon_Fire_Tablet.jpg",
   },
   {
@@ -93,7 +107,8 @@ const dummyDevices = [
     price: 29.99,
     stock: 200,
     description: "Reusable vacuum storage bags with hand pump",
-    imageUrl: "/images/Amazon Basics Vacuum Compression Storage Bags (6-Pack).jpg",
+    imageUrl:
+      "/images/Amazon Basics Vacuum Compression Storage Bags (6-Pack).jpg",
   },
   {
     name: "Portwest Radial 3 in 1 Jacket (Black, XL)",
@@ -117,7 +132,7 @@ const dummyDevices = [
     name: "Amazon Kindle Paperwhite (16 GB) – Black",
     brand: "Amazon",
     catalog: "Amazon Devices & Accessories",
-    price: 249.00,
+    price: 249.0,
     stock: 75,
     description: "Glare-free e-reader with 16 GB storage",
     imageUrl: "/images/Amazon Kindle Paperwhite (16 GB) – Black.jpg",
@@ -128,7 +143,7 @@ const dummyDevices = [
     name: "Amazon Kindle (2024 release) – Matcha",
     brand: "Amazon Basics",
     catalog: "Amazon Devices & Accessories",
-    price: 169.00,
+    price: 169.0,
     stock: 90,
     description: "Lightweight Kindle with adjustable front light",
     imageUrl: "/images/Amazon Kindle (2024 release) – Matcha.jpg",
@@ -137,7 +152,7 @@ const dummyDevices = [
     name: "Ring Battery Video Doorbell",
     brand: "Amazon Basics",
     catalog: "Amazon Devices & Accessories",
-    price: 199.00,
+    price: 199.0,
     stock: 60,
     description: "Wireless security video doorbell with battery",
     imageUrl: "/images/Ring Battery Video Doorbell.jpg",
@@ -155,7 +170,7 @@ const dummyDevices = [
     name: "Amazon Kindle (2024 release) – Black",
     brand: "Amazon Basics",
     catalog: "Amazon Devices & Accessories",
-    price: 169.00,
+    price: 169.0,
     stock: 85,
     description: "Compact Kindle with glare-free display",
     imageUrl: "/images/Amazon Kindle (2024 release) – Black.jpg",
@@ -176,7 +191,8 @@ const dummyDevices = [
     price: 39.99,
     stock: 140,
     description: "Multicolour smart Wi-Fi LED light bulb with remote control",
-    imageUrl: "/images/TP-Link Tapo Smart Wi-Fi Light Bulb (E27, Multicolour, 2-Pack).jpg",
+    imageUrl:
+      "/images/TP-Link Tapo Smart Wi-Fi Light Bulb (E27, Multicolour, 2-Pack).jpg",
   },
 
   // 14–18: Crocs (5 items)
@@ -193,7 +209,7 @@ const dummyDevices = [
     name: "Dove Triple Moisturising Body Wash 1 L",
     brand: "Crocs",
     catalog: "Beauty",
-    price: 7.50,
+    price: 7.5,
     stock: 300,
     description: "Triple moisturising body wash, soap-free formula",
     imageUrl: "/images/Dove Triple Moisturising Body Wash 1 L.jpg",
@@ -205,7 +221,8 @@ const dummyDevices = [
     price: 29.95,
     stock: 90,
     description: "Ultra-light, water-resistant sunscreen face fluid",
-    imageUrl: "/images/La Roche-Posay Anthelios XL Sunscreen SPF 50+ (50 ml).jpg",
+    imageUrl:
+      "/images/La Roche-Posay Anthelios XL Sunscreen SPF 50+ (50 ml).jpg",
   },
   {
     name: "The Pink Stuff Miracle Cleaning Paste 850 g",
@@ -249,7 +266,7 @@ const dummyDevices = [
     name: "Frameo Wi-Fi Digital Picture Frame 10.1″",
     brand: "The Pink Stuff",
     catalog: "Home",
-    price: 129.00,
+    price: 129.0,
     stock: 45,
     description: "10.1″ HD touch-screen photo frame with 32 GB memory",
     imageUrl: "/images/Frameo Wi-Fi Digital Picture Frame 10.1.jpg",
@@ -291,7 +308,6 @@ const dummyDevices = [
     stock: 120,
     description: "Children's book by Bluey and Bingo for Mother's Day",
     imageUrl: "/images/Bluey- My Mum is the Best.jpg",
-    
   },
   {
     name: "Easy Dinner Queen (Cookbook)",
@@ -326,7 +342,7 @@ const dummyDevices = [
     name: "Amazon Basics Digital Kitchen Scale",
     brand: "Generic",
     catalog: "Household Appliances",
-    price: 17.90,
+    price: 17.9,
     stock: 210,
     description: "Digital kitchen scale with LCD display, up to 4.9 kg",
     imageUrl: "/images/Amazon Basics Digital Kitchen Scale.jpg",
@@ -335,17 +351,29 @@ const dummyDevices = [
     name: "Paula's Choice Skin Perfecting 2% BHA Liquid Exfoliant",
     brand: "Generic",
     catalog: "Beauty",
-    price: 56.00,
+    price: 56.0,
     stock: 80,
     description: "Liquid exfoliant with 2% salicylic acid for pores",
     imageUrl: "/images/Paula's chocie.jpg",
-  }
+  },
 ];
 
-
-
-
-
+const dummyUsers = [
+  {
+    fullName: "Admin User",
+    email: "admin@example.com",
+    password: "123456",
+    phone: "1234567890",
+    role: "staff",
+  },
+  {
+    fullName: "John Doe",
+    email: "john@example.com",
+    password: "123456",
+    phone: "0987654321",
+    role: "customer",
+  },
+];
 
 (async () => {
   try {
@@ -355,7 +383,21 @@ const dummyDevices = [
     // Insert our dummy devices
     await Device.bulkCreate(dummyDevices);
 
-    console.log("✅  Seeding complete. You now have", dummyDevices.length, "devices.");
+    // Hash passwords for dummy users
+    for (const user of dummyUsers) {
+      user.password = await bcrypt.hash(user.password, 10);
+    }
+
+    // Insert our dummy users
+    await User.bulkCreate(dummyUsers);
+
+    console.log(
+      "✅  Seeding complete. You now have",
+      dummyDevices.length,
+      "devices and",
+      dummyUsers.length,
+      "users."
+    );
     process.exit(0);
   } catch (err) {
     console.error("❌  Seeding failed:", err);

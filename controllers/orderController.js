@@ -1,6 +1,8 @@
 // controllers/orderController.js
 const Order = require("../models/order");
 const Device = require("../models/device");
+const Payment = require("../models/payment");
+const Shipment = require("../models/shipment");
 
 // View list of customer's orders
 exports.viewOrders = async (req, res) => {
@@ -143,7 +145,7 @@ exports.viewOrderDetails = async (req, res) => {
 
   try {
     const order = await Order.findByPk(orderId, {
-      include: [Device],
+      include: [Device, Payment, Shipment],
     });
 
     if (!order || order.userId !== req.session.userId) {

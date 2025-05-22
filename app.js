@@ -7,17 +7,16 @@ const User = require("./models/user");
 const Device = require("./models/device");
 const Order = require("./models/order");
 const Payment = require("./models/payment");
-const Cart   = require('./models/cart');
+const Cart = require("./models/cart");
 const Shipment = require("./models/shipment");
 const Address = require("./models/address");
 
-
 // Define the relationships:
-User.hasMany(Cart,    { foreignKey: "userId" });
-Cart.belongsTo(User,  { foreignKey: "userId" });
+User.hasMany(Cart, { foreignKey: "userId" });
+Cart.belongsTo(User, { foreignKey: "userId" });
 
-Device.hasMany(Cart,  { foreignKey: "deviceId" });
-Cart.belongsTo(Device,{ foreignKey: "deviceId" });
+Device.hasMany(Cart, { foreignKey: "deviceId" });
+Cart.belongsTo(Device, { foreignKey: "deviceId" });
 
 Order.hasOne(Shipment, { foreignKey: "orderId" });
 Shipment.belongsTo(Order, { foreignKey: "orderId" });
@@ -28,29 +27,20 @@ Address.belongsTo(User, { foreignKey: "userId" });
 Address.hasMany(Shipment, { foreignKey: "addressId" });
 Shipment.belongsTo(Address, { foreignKey: "addressId" });
 
-
+// Import routes
 const authRoutes = require("./routes/auth");
 const deviceRoutes = require("./routes/devices");
 const orderRoutes = require("./routes/orders");
 const paymentRoutes = require("./routes/payments");
 const userRoutes = require("./routes/user");
-const deliveryRoutes = require('./routes/delivery');
+const deliveryRoutes = require("./routes/delivery");
 const shipmentRoutes = require("./routes/shipment");
 const addressRoutes = require("./routes/address");
-
-
-const productRoutes = require("./routes/product"); 
-
-const cartRoutes   = require("./routes/cart");
-
-
-const routes = require("./routes");
-
+const productRoutes = require("./routes/product");
+const cartRoutes = require("./routes/cart");
 
 const app = express();
 const PORT = 3000;
-
-
 
 // View engine
 app.set("views", path.join(__dirname, "views"));
@@ -63,27 +53,24 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// ✅ Session MUST come before routes or custom middleware
+// Session setup
 app.use(
   session({
-    secret: "secret-key",
+    secret: "your-secret-key", // This is fine for a university assignment
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
+    cookie: { maxAge: 24 * 60 * 60 * 1000 }, // 24 hours
   })
 );
 
-
-
-// ✅ Add userName to all views BEFORE routes
+// Add userName to all views
 app.use((req, res, next) => {
   res.locals.userName = req.session.userName || null;
   res.locals.userRole = req.session.userRole || null;
   next();
 });
 
-
-
-// Flash middleware: pull from session into locals, then clear
+// Flash middleware
 app.use((req, res, next) => {
   res.locals.flash = req.session.flash;
   delete req.session.flash;
@@ -91,24 +78,21 @@ app.use((req, res, next) => {
 });
 
 // Routes
-
 app.use("/", authRoutes);
 app.use("/", deviceRoutes);
 app.use("/", orderRoutes);
 app.use("/", paymentRoutes);
 app.use("/", userRoutes);
-app.use("/", cartRoutes); // Cart routes
-app.use("/", productRoutes); 
-app.use('/', deliveryRoutes); // Delivery routes
+app.use("/", cartRoutes);
+app.use("/", productRoutes);
+app.use("/", deliveryRoutes);
 app.use("/", shipmentRoutes);
 app.use("/", addressRoutes);
-
 
 // Home route
 app.get("/", (req, res) => {
   res.render("index");
 });
-
 
 // Protected dashboard
 app.get("/dashboard", (req, res) => {
@@ -134,19 +118,4 @@ sequelize
 // 404 Page Handler
 app.use((req, res, next) => {
   res.status(404).render("404");
-});
-
-// Add userName and userRole to all views BEFORE routes
-app.use((req, res, next) => {
-  res.locals.userName = req.session.userName || null;
-  res.locals.userRole = req.session.userRole || null;
-  next();
-});
-
-// Mount all routes
-app.use("/", routes);
-
-// Home route
-app.get("/", (req, res) => {
-  res.render("index");
 });

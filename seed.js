@@ -12,7 +12,8 @@ const User = require("./models/user");
 const Order = require("./models/order");
 const Payment = require("./models/payment");
 const Shipment = require("./models/shipment");
-const AccessLog = require("./models/accessLog");
+const AccessLog = require("./models/userAccessLog");
+const Address = require("./models/address");
 
 /**
  * Sample Device Data
@@ -616,64 +617,52 @@ const dummyUsers = [
   },
 ];
 
+const dummyAddresses = Array.from({ length: 20 }, (_, i) => {
+  const userId = 11 + Math.floor(i / 2); // Match with users
+  return {
+    userId,
+    label: ["Home", "Work", "Other"][Math.floor(Math.random() * 3)],
+    street: `${Math.floor(1 + Math.random() * 999)} ${
+      ["George St", "Pitt St", "Elizabeth St", "Kent St", "Sussex St"][
+        Math.floor(Math.random() * 5)
+      ]
+    }`,
+    city: "Sydney",
+    postcode: `${2000 + Math.floor(Math.random() * 100)}`,
+    country: "Australia",
+  };
+});
+
 const dummyOrders = Array.from({ length: 20 }, (_, i) => {
   const userId = 11 + Math.floor(i / 2); // Distribute orders among customers
-  const orderDate = new Date(2024, 2, 1 + i); // Starting from March 1, 2024
-  const items = [
-    {
-      deviceId: 1 + Math.floor(Math.random() * 20),
-      quantity: 1 + Math.floor(Math.random() * 3),
-      price: 99.99 + Math.floor(Math.random() * 900),
-    },
-  ];
-  const totalAmount = items.reduce(
-    (sum, item) => sum + item.quantity * item.price,
-    0
-  );
+  const deviceId = 1 + Math.floor(Math.random() * 20); // Random device
+  const quantity = 1 + Math.floor(Math.random() * 3); // Random quantity between 1-3
 
   return {
     userId,
-    status: ["pending", "completed", "cancelled"][
-      Math.floor(Math.random() * 3)
-    ],
-    totalAmount,
-    orderDate,
-    items: JSON.stringify(items),
+    deviceId,
+    quantity,
+    status: ["Placed", "Completed", "Cancelled"][Math.floor(Math.random() * 3)],
   };
 });
 
 const dummyPayments = dummyOrders.map((order, i) => ({
   orderId: i + 1,
-  amount: order.totalAmount,
+  amount: order.quantity * order.price,
   paymentMethod: ["credit_card", "debit_card", "paypal"][
     Math.floor(Math.random() * 3)
   ],
   status: order.status === "cancelled" ? "refunded" : "completed",
-  paymentDate: order.orderDate,
+  paymentDate: new Date(),
   cardLast4: Math.floor(1000 + Math.random() * 9000).toString(),
 }));
 
 const dummyShipments = dummyOrders.map((order, i) => ({
   orderId: i + 1,
-  status:
-    order.status === "cancelled"
-      ? "cancelled"
-      : order.status === "completed"
-      ? "delivered"
-      : "processing",
-  address: `${Math.floor(1 + Math.random() * 999)} ${
-    ["George St", "Pitt St", "Elizabeth St", "Kent St", "Sussex St"][
-      Math.floor(Math.random() * 5)
-    ]
-  }, Sydney NSW ${2000 + Math.floor(Math.random() * 100)}`,
-  trackingNumber: `TRACK${Math.floor(100000 + Math.random() * 900000)}`,
-  shippingMethod: ["standard", "express", "priority"][
-    Math.floor(Math.random() * 3)
-  ],
-  estimatedDelivery: new Date(
-    order.orderDate.getTime() +
-      (3 + Math.floor(Math.random() * 5)) * 24 * 60 * 60 * 1000
-  ),
+  addressId: i + 1, // Each order gets a corresponding address
+  method: ["Standard", "Express", "Priority"][Math.floor(Math.random() * 3)],
+  shipmentDate: new Date(),
+  finalised: false,
 }));
 
 const dummyAccessLogs = Array.from({ length: 40 }, (_, i) => {
@@ -701,9 +690,10 @@ const dummyAccessLogs = Array.from({ length: 40 }, (_, i) => {
  * 1. Synchronizes database schema
  * 2. Creates sample devices
  * 3. Creates test users
- * 4. Generates sample orders
- * 5. Creates test payments
- * 6. Sets up shipment records
+ * 4. Generates sample addresses
+ * 5. Creates sample orders
+ * 6. Creates test payments
+ * 7. Sets up shipment records
  *
  * @throws {Error} If database seeding fails
  * @returns {Promise<void>}
@@ -719,11 +709,15 @@ async function seedDatabase() {
     console.log("✅ Sample devices created");
 
     // Create test users
-    const users = await User.bulkCreate(dummyUsers);
+    await User.bulkCreate(dummyUsers);
     console.log("✅ Test users created");
 
+    // Create addresses
+    await Address.bulkCreate(dummyAddresses);
+    console.log("✅ Sample addresses created");
+
     // Create sample orders
-    const orders = await Order.bulkCreate(dummyOrders);
+    await Order.bulkCreate(dummyOrders);
     console.log("✅ Sample orders created");
 
     // Create test payments

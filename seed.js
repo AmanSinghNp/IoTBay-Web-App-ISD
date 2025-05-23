@@ -3,13 +3,15 @@ const sequelize = require("./config/database");
 const Device = require("./models/device");
 const User = require("./models/user");
 const Order = require("./models/order");
-const Payment = require("./models/payment");
 const UserAccessLog = require("./models/userAccessLog");
 const Shipment = require("./models/shipment");
 const Address = require("./models/address");
 const Cart = require("./models/cart");
 const bcrypt = require("bcrypt");
 const OrderItem = require("./models/orderItem");
+
+// Import SQLite Payment model for the new payment management system
+const Payment = require("./models/payment");
 
 const dummyDevices = [
   // 1–7: Amazon (7 items)
@@ -540,29 +542,77 @@ async function createOrderItems(orders, devices) {
   return orderItems;
 }
 
-// Create payments for completed orders
-function createPayments(orders) {
-  const payments = [];
-
-  const paymentMethods = ["Credit Card", "PayPal", "Bank Transfer"];
+// Create SQLite payment records for the new payment management system
+function createSQLitePaymentRecords(orders, userId) {
+  const paymentRecords = [];
+  const paymentMethods = ["Credit Card", "Debit Card", "PayPal"];
+  const cardNumbers = [
+    "4111-1111-1111-1111", // Visa test number
+    "5555-5555-5555-4444", // Mastercard test number
+    "3782-8224-6310-005", // American Express test number
+  ];
+  const expiryDates = ["12/26", "05/27", "09/28", "03/29"];
+  const cvvs = ["123", "456", "789", "321"];
 
   for (const order of orders) {
-    // Only create payments for completed orders
-    if (order.status === "Completed") {
-      payments.push({
-        orderId: order.id,
-        paymentMethod:
-          paymentMethods[Math.floor(Math.random() * paymentMethods.length)],
-        status: "Successful",
-        amount: (Math.random() * 500 + 50).toFixed(2), // Random amount $50-$550
-        transactionId: `txn_${Math.random().toString(36).substring(2, 15)}`,
-        createdAt: order.updatedAt, // Payment created when order was completed
-        updatedAt: order.updatedAt,
-      });
-    }
+    // Create payment records for all orders (not just completed ones)
+    const randomMethod =
+      paymentMethods[Math.floor(Math.random() * paymentMethods.length)];
+    const randomCard =
+      cardNumbers[Math.floor(Math.random() * cardNumbers.length)];
+    const randomExpiry =
+      expiryDates[Math.floor(Math.random() * expiryDates.length)];
+    const randomCvv = cvvs[Math.floor(Math.random() * cvvs.length)];
+
+    // Calculate amount based on a realistic range
+    const amount = (Math.random() * 800 + 100).toFixed(2); // $100-$900
+
+    // Format payment date as YYYY-MM-DD
+    const paymentDate = order.createdAt.toISOString().split("T")[0];
+
+    paymentRecords.push({
+      payment_method: randomMethod,
+      card_number: randomCard,
+      expiry_date: randomExpiry,
+      cvv: randomCvv,
+      amount: parseFloat(amount),
+      payment_date: paymentDate,
+      order_id: order.id,
+      user_id: userId,
+    });
   }
 
-  return payments;
+  return paymentRecords;
+}
+
+// Helper function to insert SQLite payment records
+function insertSQLitePaymentRecords(paymentRecords) {
+  return new Promise((resolve, reject) => {
+    let completed = 0;
+    const total = paymentRecords.length;
+
+    if (total === 0) {
+      resolve();
+      return;
+    }
+
+    let hasError = false;
+
+    paymentRecords.forEach((record) => {
+      Payment.create(record, (err, result) => {
+        if (err && !hasError) {
+          hasError = true;
+          reject(err);
+          return;
+        }
+
+        completed++;
+        if (completed === total && !hasError) {
+          resolve();
+        }
+      });
+    });
+  });
 }
 
 (async () => {
@@ -602,11 +652,11 @@ function createPayments(orders) {
     // Insert order items
     await OrderItem.bulkCreate(orderItems);
 
-    // Create payments for completed orders
-    const payments = createPayments(orders);
+    // Create SQLite payment records for the new payment management system
+    const sqlitePaymentRecords = createSQLitePaymentRecords(orders, 2);
 
-    // Insert payments
-    await Payment.bulkCreate(payments);
+    // Insert SQLite payment records
+    await insertSQLitePaymentRecords(sqlitePaymentRecords);
 
     console.log(
       "✅  Seeding complete. You now have",
@@ -619,9 +669,9 @@ function createPayments(orders) {
       orders.length,
       "orders,",
       orderItems.length,
-      "order items, and",
-      payments.length,
-      "payments."
+      "order items,",
+      sqlitePaymentRecords.length,
+      "SQLite payment records."
     );
     process.exit(0);
   } catch (err) {

@@ -1,12 +1,13 @@
 const express = require("express");
 const path = require("path");
 const session = require("express-session");
+const flash = require("connect-flash");
 
 const sequelize = require("./config/database");
 const User = require("./models/user");
 const Device = require("./models/device");
 const Order = require("./models/order");
-const Payment = require("./models/payment");
+// const Payment = require("./models/payment"); // SQLite-based model, not part of Sequelize relationships
 const Cart = require("./models/cart");
 const Shipment = require("./models/shipment");
 const Address = require("./models/address");
@@ -31,7 +32,8 @@ Shipment.belongsTo(Address, { foreignKey: "addressId" });
 const authRoutes = require("./routes/auth");
 const deviceRoutes = require("./routes/devices");
 const orderRoutes = require("./routes/orders");
-const paymentRoutes = require("./routes/payments");
+const checkoutRoutes = require("./routes/payments"); // Old checkout system
+const paymentManagementRoutes = require("./routes/paymentRoutes"); // New payment management system
 const userRoutes = require("./routes/user");
 const deliveryRoutes = require("./routes/delivery");
 const shipmentRoutes = require("./routes/shipment");
@@ -63,6 +65,9 @@ app.use(
   })
 );
 
+// Flash middleware
+app.use(flash());
+
 // Add userName to all views
 app.use((req, res, next) => {
   res.locals.userName = req.session.userName || null;
@@ -70,7 +75,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Flash middleware
+// Flash middleware - make flash messages available to views
 app.use((req, res, next) => {
   res.locals.flash = req.session.flash;
   delete req.session.flash;
@@ -81,7 +86,8 @@ app.use((req, res, next) => {
 app.use("/", authRoutes);
 app.use("/", deviceRoutes);
 app.use("/", orderRoutes);
-app.use("/", paymentRoutes);
+app.use("/", checkoutRoutes);
+app.use("/", paymentManagementRoutes);
 app.use("/", userRoutes);
 app.use("/", cartRoutes);
 app.use("/", productRoutes);

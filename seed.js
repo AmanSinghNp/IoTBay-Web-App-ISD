@@ -542,6 +542,83 @@ async function createOrderItems(orders, devices) {
   return orderItems;
 }
 
+// Create sample addresses for users
+function createSampleAddresses(userId) {
+  const addresses = [
+    {
+      userId: userId,
+      label: "Home Address",
+      street: "123 Main Street",
+      city: "Sydney",
+      postcode: "2000",
+      country: "Australia",
+    },
+    {
+      userId: userId,
+      label: "Work Office",
+      street: "456 Business Avenue",
+      city: "Melbourne",
+      postcode: "3000",
+      country: "Australia",
+    },
+    {
+      userId: userId,
+      label: "Secondary Address",
+      street: "789 Park Lane",
+      city: "Brisbane",
+      postcode: "4000",
+      country: "Australia",
+    },
+  ];
+
+  return addresses;
+}
+
+// Create sample shipments for customer orders
+async function createSampleShipments(orders, addresses) {
+  const shipments = [];
+  const shippingMethods = [
+    "Standard Delivery",
+    "Express Delivery",
+    "Next Day Delivery",
+    "Same Day Delivery",
+    "Store Pickup",
+  ];
+
+  // Create shipments for some of the orders (not all)
+  const ordersToShip = orders.filter((order, index) => index % 2 === 0); // Every other order
+
+  ordersToShip.forEach((order, index) => {
+    const randomMethod =
+      shippingMethods[Math.floor(Math.random() * shippingMethods.length)];
+    const randomAddress =
+      addresses[Math.floor(Math.random() * addresses.length)];
+
+    // Calculate shipment date (1-7 days after order date)
+    const shipmentDate = new Date(order.createdAt);
+    shipmentDate.setDate(
+      shipmentDate.getDate() + Math.floor(Math.random() * 7) + 1
+    );
+
+    // Some shipments are finalized, some are pending
+    const isFinalized = Math.random() > 0.4; // 60% chance of being finalized
+
+    shipments.push({
+      orderId: order.id,
+      addressId: randomAddress.id,
+      method: randomMethod,
+      shipmentDate: shipmentDate.toISOString().split("T")[0], // YYYY-MM-DD format
+      finalised: isFinalized,
+      createdAt: new Date(order.createdAt.getTime() + Math.random() * 86400000), // Random time after order
+      updatedAt: new Date(
+        order.createdAt.getTime() + Math.random() * 172800000
+      ), // Random time within 2 days
+    });
+  });
+
+  return shipments;
+}
+
 // Create SQLite payment records for the new payment management system
 function createSQLitePaymentRecords(orders, userId) {
   const paymentRecords = [];
@@ -617,8 +694,19 @@ function insertSQLitePaymentRecords(paymentRecords) {
 
 (async () => {
   try {
-    // Drop & recreate tables
-    await sequelize.sync({ force: true });
+    // Sync database (create tables if they don't exist)
+    await sequelize.sync();
+    console.log("✅ Database synced successfully");
+
+    // Clear existing test data only
+    await UserAccessLog.destroy({ where: {} });
+    await OrderItem.destroy({ where: {} });
+    await Shipment.destroy({ where: {} });
+    await Order.destroy({ where: {} });
+    await Address.destroy({ where: {} });
+    await Device.destroy({ where: {} });
+    await User.destroy({ where: {} });
+    console.log("✅ Cleared existing data");
 
     // Insert our dummy devices
     const devices = await Device.bulkCreate(dummyDevices);
@@ -652,6 +740,20 @@ function insertSQLitePaymentRecords(paymentRecords) {
     // Insert order items
     await OrderItem.bulkCreate(orderItems);
 
+    // Create sample addresses for users
+    const addresses = createSampleAddresses(2);
+
+    // Insert addresses
+    const createdAddresses = await Address.bulkCreate(addresses);
+    console.log(`✅ Created ${createdAddresses.length} addresses`);
+
+    // Create sample shipments for customer orders
+    const shipments = await createSampleShipments(orders, createdAddresses);
+    console.log(`✅ Prepared ${shipments.length} shipments for insertion`);
+
+    // Insert shipments
+    await Shipment.bulkCreate(shipments);
+
     // Create SQLite payment records for the new payment management system
     const sqlitePaymentRecords = createSQLitePaymentRecords(orders, 2);
 
@@ -670,6 +772,10 @@ function insertSQLitePaymentRecords(paymentRecords) {
       "orders,",
       orderItems.length,
       "order items,",
+      addresses.length,
+      "addresses,",
+      shipments.length,
+      "shipments,",
       sqlitePaymentRecords.length,
       "SQLite payment records."
     );

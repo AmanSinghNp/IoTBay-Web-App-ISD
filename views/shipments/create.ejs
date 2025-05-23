@@ -1,0 +1,302 @@
+<%- include('../partials/header') %>
+
+<section class="min-h-screen bg-gray-100 py-8">
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Create New Shipment</h1>
+      <p class="text-gray-600">Set up shipping details for your order</p>
+    </div>
+
+    <!-- Flash Messages -->
+    <% if (locals.flash && locals.flash.error) { %>
+    <div
+      class="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
+    >
+      <%= locals.flash.error %>
+    </div>
+    <% } %>
+
+    <!-- Back Navigation -->
+    <div class="mb-6">
+      <a
+        href="/shipments"
+        class="inline-flex items-center text-blue-600 hover:text-blue-700 hover:underline"
+      >
+        <svg
+          class="w-5 h-5 mr-2"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 19l-7-7 7-7"
+          ></path>
+        </svg>
+        Back to Shipments
+      </a>
+    </div>
+
+    <!-- Create Shipment Form -->
+    <div class="bg-white rounded-lg shadow-sm border">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-900">Shipment Details</h2>
+      </div>
+
+      <form action="/shipments/create" method="POST" class="p-6 space-y-6">
+        <!-- Order Selection -->
+        <div>
+          <label
+            for="orderId"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Select Order <span class="text-red-500">*</span>
+          </label>
+          <% if (orders.length === 0) { %>
+          <div class="border border-gray-300 rounded-md p-4 bg-gray-50">
+            <p class="text-gray-500 text-center">
+              No orders available for shipment.
+            </p>
+            <p class="text-sm text-gray-400 text-center mt-2">
+              Orders must be in "Placed" status and not have existing shipments.
+            </p>
+          </div>
+          <% } else { %>
+          <select
+            id="orderId"
+            name="orderId"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">Choose an order...</option>
+            <% orders.forEach(order => { %>
+            <option value="<%= order.id %>">
+              Order #<%= order.id %> - <% if (order.OrderItems.length === 1) {
+              %> <%= order.OrderItems[0].Device.name %> (x<%=
+              order.OrderItems[0].quantity %>) <% } else { %> <%=
+              order.OrderItems.length %> items <% } %> - <%= new
+              Date(order.createdAt).toLocaleDateString() %>
+            </option>
+            <% }); %>
+          </select>
+          <p class="mt-2 text-sm text-gray-500">
+            Select the order you want to create a shipment for
+          </p>
+          <% } %>
+        </div>
+
+        <!-- Shipping Method -->
+        <div>
+          <label
+            for="method"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Shipping Method <span class="text-red-500">*</span>
+          </label>
+          <select
+            id="method"
+            name="method"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">Choose shipping method...</option>
+            <option value="Standard Delivery">
+              Standard Delivery (5-7 business days)
+            </option>
+            <option value="Express Delivery">
+              Express Delivery (2-3 business days)
+            </option>
+            <option value="Next Day Delivery">
+              Next Day Delivery (1 business day)
+            </option>
+            <option value="Same Day Delivery">
+              Same Day Delivery (within 24 hours)
+            </option>
+            <option value="Store Pickup">Store Pickup</option>
+          </select>
+          <p class="mt-2 text-sm text-gray-500">
+            Choose your preferred delivery method
+          </p>
+        </div>
+
+        <!-- Shipment Date -->
+        <div>
+          <label
+            for="shipmentDate"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Shipment Date <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="date"
+            id="shipmentDate"
+            name="shipmentDate"
+            required
+            min="<%= new Date().toISOString().split('T')[0] %>"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          <p class="mt-2 text-sm text-gray-500">
+            Select the date when you want the shipment to be sent
+          </p>
+        </div>
+
+        <!-- Delivery Address -->
+        <div>
+          <label
+            for="addressId"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Delivery Address <span class="text-red-500">*</span>
+          </label>
+          <% if (addresses.length === 0) { %>
+          <div class="border border-gray-300 rounded-md p-4 bg-gray-50">
+            <p class="text-gray-500">No delivery addresses found.</p>
+            <a
+              href="/address/create"
+              class="mt-2 inline-flex items-center text-blue-600 hover:text-blue-700 hover:underline text-sm"
+            >
+              <svg
+                class="w-4 h-4 mr-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                ></path>
+              </svg>
+              Add a new address
+            </a>
+          </div>
+          <% } else { %>
+          <select
+            id="addressId"
+            name="addressId"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">Choose delivery address...</option>
+            <% addresses.forEach(address => { %>
+            <option value="<%= address.id %>">
+              <%= address.label %> - <%= address.street %>, <%= address.city %>,
+              <%= address.postcode %>
+            </option>
+            <% }); %>
+          </select>
+          <div class="mt-2 flex items-center justify-between">
+            <p class="text-sm text-gray-500">
+              Choose where you want the order to be delivered
+            </p>
+            <a
+              href="/address/create"
+              class="inline-flex items-center text-blue-600 hover:text-blue-700 hover:underline text-sm"
+            >
+              <svg
+                class="w-4 h-4 mr-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                ></path>
+              </svg>
+              Add new address
+            </a>
+          </div>
+          <% } %>
+        </div>
+
+        <!-- Form Actions -->
+        <div
+          class="flex items-center justify-end gap-3 pt-6 border-t border-gray-200"
+        >
+          <a
+            href="/shipments"
+            class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+          >
+            Cancel
+          </a>
+          <% if (orders.length > 0 && addresses.length > 0) { %>
+          <button
+            type="submit"
+            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+          >
+            <svg
+              class="w-4 h-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+              ></path>
+            </svg>
+            Create Shipment
+          </button>
+          <% } else { %>
+          <button
+            type="button"
+            disabled
+            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-gray-400 bg-gray-200 cursor-not-allowed"
+          >
+            Create Shipment
+          </button>
+          <% } %>
+        </div>
+      </form>
+    </div>
+
+    <!-- Help Section -->
+    <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg
+            class="h-5 w-5 text-blue-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-blue-800">Need Help?</h3>
+          <div class="mt-2 text-sm text-blue-700">
+            <ul class="list-disc pl-5 space-y-1">
+              <li>
+                You can only create shipments for orders that are in "Placed"
+                status
+              </li>
+              <li>Each order can only have one shipment</li>
+              <li>You can edit shipment details before finalization</li>
+              <li>
+                Make sure to have at least one delivery address added to your
+                account
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

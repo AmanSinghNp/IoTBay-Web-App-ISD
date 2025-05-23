@@ -1,0 +1,440 @@
+<%- include('../partials/header') %>
+
+<section class="min-h-screen bg-gray-100 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">My Shipments</h1>
+      <p class="text-gray-600">
+        Manage your order shipments and delivery details
+      </p>
+    </div>
+
+    <!-- Flash Messages -->
+    <% if (locals.flash && locals.flash.success) { %>
+    <div
+      class="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg"
+    >
+      <%= locals.flash.success %>
+    </div>
+    <% } %> <% if (locals.flash && locals.flash.error) { %>
+    <div
+      class="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
+    >
+      <%= locals.flash.error %>
+    </div>
+    <% } %>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white rounded-lg shadow-sm p-6 border">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div
+              class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center"
+            >
+              <svg
+                class="w-5 h-5 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                ></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-lg font-semibold text-gray-900">Total Shipments</h3>
+            <p class="text-2xl font-bold text-blue-600">
+              <%= shipments.length %>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-sm p-6 border">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div
+              class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center"
+            >
+              <svg
+                class="w-5 h-5 text-yellow-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-lg font-semibold text-gray-900">Pending</h3>
+            <p class="text-2xl font-bold text-yellow-600">
+              <%= shipments.filter(s => !s.finalised).length %>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-sm p-6 border">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div
+              class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center"
+            >
+              <svg
+                class="w-5 h-5 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                ></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-lg font-semibold text-gray-900">Finalized</h3>
+            <p class="text-2xl font-bold text-green-600">
+              <%= shipments.filter(s => s.finalised).length %>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search and Actions Bar -->
+    <div class="bg-white rounded-lg shadow-sm border mb-6">
+      <div class="p-6">
+        <div
+          class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4"
+        >
+          <!-- Search Form -->
+          <div class="flex-1 w-full lg:w-auto">
+            <form method="GET" action="/shipments" class="flex flex-wrap gap-3">
+              <div class="flex-1 min-w-[200px]">
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Shipment ID</label
+                >
+                <input
+                  type="number"
+                  name="shipmentId"
+                  placeholder="Enter shipment ID"
+                  value="<%= searchParams.shipmentId || '' %>"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div class="flex-1 min-w-[200px]">
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Shipment Date</label
+                >
+                <input
+                  type="date"
+                  name="shipmentDate"
+                  value="<%= searchParams.shipmentDate || '' %>"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div class="flex-1 min-w-[200px]">
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Order ID</label
+                >
+                <input
+                  type="number"
+                  name="orderId"
+                  placeholder="Enter order ID"
+                  value="<%= searchParams.orderId || '' %>"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div class="flex items-end gap-2">
+                <button
+                  type="submit"
+                  class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  Search
+                </button>
+                <a
+                  href="/shipments"
+                  class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors"
+                >
+                  Clear
+                </a>
+              </div>
+            </form>
+          </div>
+
+          <!-- Create Button -->
+          <div class="w-full lg:w-auto">
+            <% if (ordersWithoutShipments.length > 0) { %>
+            <a
+              href="/shipments/create"
+              class="w-full lg:w-auto inline-flex items-center justify-center bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+            >
+              <svg
+                class="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                ></path>
+              </svg>
+              Create New Shipment
+            </a>
+            <% } else { %>
+            <span class="inline-flex items-center text-gray-500 text-sm">
+              <svg
+                class="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+              No orders available for shipment
+            </span>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shipments List -->
+    <div class="bg-white rounded-lg shadow-sm border">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-900">Your Shipments</h2>
+      </div>
+
+      <% if (shipments.length === 0) { %>
+      <div class="p-12 text-center">
+        <svg
+          class="mx-auto h-12 w-12 text-gray-400 mb-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+          ></path>
+        </svg>
+        <h3 class="text-lg font-medium text-gray-900 mb-1">
+          No shipments found
+        </h3>
+        <p class="text-gray-500 mb-4">
+          <% if (searchParams.shipmentId || searchParams.shipmentDate ||
+          searchParams.orderId) { %> Try adjusting your search criteria or
+          <a href="/shipments" class="text-blue-600 hover:underline"
+            >clear filters</a
+          >
+          <% } else { %> You haven't created any shipments yet. <% } %>
+        </p>
+        <% if (ordersWithoutShipments.length > 0) { %>
+        <a
+          href="/shipments/create"
+          class="inline-flex items-center bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+        >
+          Create Your First Shipment
+        </a>
+        <% } %>
+      </div>
+      <% } else { %>
+      <div class="divide-y divide-gray-200">
+        <% shipments.forEach(shipment => { %>
+        <div class="p-6 hover:bg-gray-50 transition-colors">
+          <div
+            class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4"
+          >
+            <!-- Shipment Info -->
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-2">
+                <h3 class="text-lg font-semibold text-gray-900">
+                  Shipment #<%= shipment.id %>
+                </h3>
+                <% if (shipment.finalised) { %>
+                <span
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                >
+                  Finalized
+                </span>
+                <% } else { %>
+                <span
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
+                >
+                  Pending
+                </span>
+                <% } %>
+              </div>
+
+              <div
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-sm text-gray-600"
+              >
+                <div>
+                  <span class="font-medium">Order:</span>
+                  <a
+                    href="/orders/view/<%= shipment.Order.id %>"
+                    class="text-blue-600 hover:underline ml-1"
+                  >
+                    #<%= shipment.Order.id %>
+                  </a>
+                </div>
+                <div>
+                  <span class="font-medium">Method:</span>
+                  <span class="ml-1"><%= shipment.method %></span>
+                </div>
+                <div>
+                  <span class="font-medium">Date:</span>
+                  <span class="ml-1"
+                    ><%= new Date(shipment.shipmentDate).toLocaleDateString()
+                    %></span
+                  >
+                </div>
+                <div>
+                  <span class="font-medium">Address:</span>
+                  <span class="ml-1"><%= shipment.Address.label %></span>
+                </div>
+              </div>
+
+              <!-- Order Items Preview -->
+              <div class="mt-3">
+                <span class="text-sm font-medium text-gray-700">Items:</span>
+                <div class="flex flex-wrap gap-2 mt-1">
+                  <% shipment.Order.OrderItems.slice(0, 3).forEach(item => { %>
+                  <span
+                    class="inline-flex items-center px-2 py-1 rounded-md text-xs bg-blue-100 text-blue-800"
+                  >
+                    <%= item.Device.name %> (x<%= item.quantity %>)
+                  </span>
+                  <% }); %> <% if (shipment.Order.OrderItems.length > 3) { %>
+                  <span
+                    class="inline-flex items-center px-2 py-1 rounded-md text-xs bg-gray-100 text-gray-600"
+                  >
+                    +<%= shipment.Order.OrderItems.length - 3 %> more
+                  </span>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex flex-wrap gap-2">
+              <a
+                href="/shipments/<%= shipment.id %>/details"
+                class="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+              >
+                View Details
+              </a>
+
+              <% if (!shipment.finalised) { %>
+              <a
+                href="/shipments/<%= shipment.id %>/edit"
+                class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded-md text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors"
+              >
+                Edit
+              </a>
+
+              <form
+                method="POST"
+                action="/shipments/<%= shipment.id %>/finalize"
+                class="inline-block"
+              >
+                <button
+                  type="submit"
+                  onclick="return confirm('Are you sure you want to finalize this shipment? This action cannot be undone.')"
+                  class="inline-flex items-center px-3 py-1.5 border border-green-300 rounded-md text-sm font-medium text-green-700 bg-green-50 hover:bg-green-100 transition-colors"
+                >
+                  Finalize
+                </button>
+              </form>
+
+              <form
+                method="POST"
+                action="/shipments/<%= shipment.id %>/delete"
+                class="inline-block"
+              >
+                <button
+                  type="submit"
+                  onclick="return confirm('Are you sure you want to delete this shipment?')"
+                  class="inline-flex items-center px-3 py-1.5 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 transition-colors"
+                >
+                  Delete
+                </button>
+              </form>
+              <% } %>
+            </div>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+      <% } %>
+    </div>
+
+    <!-- Help Text -->
+    <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg
+            class="h-5 w-5 text-blue-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-blue-800">
+            Shipment Management Tips
+          </h3>
+          <div class="mt-2 text-sm text-blue-700">
+            <ul class="list-disc pl-5 space-y-1">
+              <li>
+                You can only create shipments for placed orders that don't
+                already have shipments
+              </li>
+              <li>Edit shipment details anytime before finalization</li>
+              <li>Once finalized, shipments cannot be edited or deleted</li>
+              <li>
+                Use the search function to quickly find specific shipments
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

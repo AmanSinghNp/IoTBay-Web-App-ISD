@@ -1,99 +1,58 @@
 const express = require("express");
 const router = express.Router();
-const Shipment = require("../models/shipment");
-const Order = require("../models/order");
-const Address = require("../models/address");
+const shipmentController = require("../controllers/shipmentController");
+const { isLoggedIn } = require("../middleware/authMiddleware");
 
-// Show create form with user addresses
-router.get("/shipment/create", async (req, res) => {
-  try {
-    const addresses = await Address.findAll({ where: { userId: req.session.userId } });
-    res.render("shipment_create", { addresses });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Failed to load addresses.");
-  }
-});
+// View all shipments for customer (with search)
+router.get("/shipments", isLoggedIn, shipmentController.viewShipments);
 
-// Submit new shipment
-router.post("/shipment/create", async (req, res) => {
-  const { orderId, method, shipmentDate, addressId } = req.body;
-  try {
-    await Shipment.create({ orderId, method, shipmentDate, addressId });
-    res.redirect("/shipment/view");
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Failed to create shipment.");
-  }
-});
+// Show create shipment form
+router.get(
+  "/shipments/create",
+  isLoggedIn,
+  shipmentController.getCreateShipment
+);
 
-// View shipments (with optional search)
-router.get("/shipment/view", async (req, res) => {
-  const { shipmentId, shipmentDate } = req.query;
-  const where = {};
-  if (shipmentId) where.id = shipmentId;
-  if (shipmentDate) where.shipmentDate = shipmentDate;
+// Create new shipment
+router.post("/shipments/create", isLoggedIn, shipmentController.createShipment);
 
-  try {
-    const shipments = await Shipment.findAll({
-      where,
-      include: [Address, Order],
-    });
-    res.render("shipment_view", { shipments });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Failed to fetch shipments.");
-  }
-});
+// View shipment details
+router.get(
+  "/shipments/:id/details",
+  isLoggedIn,
+  shipmentController.getShipmentDetails
+);
 
-// Show edit form
-router.get("/shipment/edit/:id", async (req, res) => {
-  try {
-    const shipment = await Shipment.findByPk(req.params.id);
-    const addresses = await Address.findAll({ where: { userId: req.session.userId } });
+// Show edit shipment form
+router.get(
+  "/shipments/:id/edit",
+  isLoggedIn,
+  shipmentController.getEditShipment
+);
 
-    if (!shipment || shipment.finalised) {
-      return res.status(403).send("Cannot edit this shipment.");
-    }
-
-    res.render("shipment_edit", { shipment, addresses });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Failed to load shipment.");
-  }
-});
-
-// Submit edit
-router.post("/shipment/edit/:id", async (req, res) => {
-  const { method, shipmentDate, addressId } = req.body;
-  try {
-    const shipment = await Shipment.findByPk(req.params.id);
-    if (!shipment || shipment.finalised) {
-      return res.status(403).send("Cannot update this shipment.");
-    }
-
-    await shipment.update({ method, shipmentDate, addressId });
-    res.redirect("/shipment/view");
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Update failed.");
-  }
-});
+// Update shipment
+router.post(
+  "/shipments/:id/edit",
+  isLoggedIn,
+  shipmentController.updateShipment
+);
 
 // Delete shipment
-router.post("/shipment/delete/:id", async (req, res) => {
-  try {
-    const shipment = await Shipment.findByPk(req.params.id);
-    if (!shipment || shipment.finalised) {
-      return res.status(403).send("Cannot delete this shipment.");
-    }
+router.post(
+  "/shipments/:id/delete",
+  isLoggedIn,
+  shipmentController.deleteShipment
+);
 
-    await shipment.destroy();
-    res.redirect("/shipment/view");
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Delete failed.");
-  }
-});
+// Finalize shipment
+router.post(
+  "/shipments/:id/finalize",
+  isLoggedIn,
+  shipmentController.finalizeShipment
+);
+
+// Legacy routes for backward compatibility
+router.get("/shipment/view", (req, res) => res.redirect("/shipments"));
+router.get("/shipment/create", (req, res) => res.redirect("/shipments/create"));
 
 module.exports = router;

@@ -29,11 +29,17 @@
                 href="/orders/view/<%= order.id %>"
                 class="text-blue-600 hover:underline"
               >
-                <%= order.Device ? order.Device.name : 'Unknown Device' %>
+                <% if (order.OrderItems.length > 0) { %> <%=
+                order.OrderItems[0].Device.name %> <% if
+                (order.OrderItems.length > 1) { %> + <%= order.OrderItems.length
+                - 1 %> more <% } %> <% } else { %> No items <% } %>
               </a>
             </td>
 
-            <td class="py-3 px-6"><%= order.quantity %></td>
+            <td class="py-3 px-6">
+              <%= order.OrderItems.reduce((sum, item) => sum + item.quantity, 0)
+              %>
+            </td>
 
             <td class="py-3 px-6">
               <span
@@ -61,27 +67,6 @@
                     class="bg-red-500 text-white text-xs px-3 py-1 rounded hover:bg-red-600"
                   >
                     Cancel
-                  </button>
-                </form>
-
-                <!-- Update Quantity Form -->
-                <form
-                  action="/orders/update/<%= order.id %>"
-                  method="POST"
-                  class="flex items-center gap-1"
-                >
-                  <input
-                    type="number"
-                    name="quantity"
-                    min="1"
-                    value="<%= order.quantity %>"
-                    class="border w-16 text-center text-xs rounded py-1"
-                  />
-                  <button
-                    type="submit"
-                    class="bg-blue-500 text-white text-xs px-3 py-1 rounded hover:bg-blue-600"
-                  >
-                    Update
                   </button>
                 </form>
               </div>

@@ -67,19 +67,30 @@
     <!-- Divider -->
     <hr class="my-6" />
 
-    <!-- Delete Account Form -->
-    <form
-      action="/profile/delete"
-      method="POST"
-      onsubmit="return confirm('Are you sure you want to delete your account?');"
-    >
-      <button
-        type="submit"
-        class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded"
+    <!-- Account Actions -->
+    <div class="space-y-4">
+      <!-- View Access Logs Link -->
+      <a
+        href="/access-log"
+        class="block w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded text-center"
       >
-        Delete My Account
-      </button>
-    </form>
+        View My Access Logs
+      </a>
+
+      <!-- Delete Account Form -->
+      <form
+        action="/profile/delete"
+        method="POST"
+        onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.');"
+      >
+        <button
+          type="submit"
+          class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded"
+        >
+          Delete My Account
+        </button>
+      </form>
+    </div>
   </div>
 </section>
 

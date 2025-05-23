@@ -9,6 +9,7 @@ const Shipment = require("./models/shipment");
 const Address = require("./models/address");
 const Cart = require("./models/cart");
 const bcrypt = require("bcrypt");
+const OrderItem = require("./models/orderItem");
 
 const dummyDevices = [
   // 1–7: Amazon (7 items)

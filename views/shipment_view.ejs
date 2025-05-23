@@ -3,36 +3,109 @@
 <div class="max-w-5xl mx-auto py-10">
   <h1 class="text-3xl font-bold mb-6">Your Shipments</h1>
 
+  <!-- Add search options -->
+  <div class="mb-6 bg-gray-100 p-4 rounded">
+    <h2 class="text-lg font-semibold mb-2">Search Shipments</h2>
+    <form method="GET" action="/shipment/view" class="flex flex-wrap gap-4">
+      <div class="flex-1">
+        <label class="block text-sm mb-1">Shipment ID</label>
+        <input
+          type="text"
+          name="shipmentId"
+          class="w-full border px-2 py-1 rounded"
+          value="<%= typeof shipmentId !== 'undefined' ? shipmentId : '' %>"
+        />
+      </div>
+      <div class="flex-1">
+        <label class="block text-sm mb-1">Shipment Date</label>
+        <input
+          type="date"
+          name="shipmentDate"
+          class="w-full border px-2 py-1 rounded"
+          value="<%= typeof shipmentDate !== 'undefined' ? shipmentDate : '' %>"
+        />
+      </div>
+      <div class="self-end">
+        <button type="submit" class="bg-blue-600 text-white py-1 px-4 rounded">
+          Search
+        </button>
+        <a href="/shipment/view" class="ml-2 text-blue-600 hover:underline"
+          >Clear</a
+        >
+      </div>
+    </form>
+  </div>
+
+  <!-- Add create button -->
+  <div class="mb-6">
+    <a
+      href="/shipment/create"
+      class="inline-block bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700"
+    >
+      Create New Shipment
+    </a>
+  </div>
+
   <% if (shipments.length === 0) { %>
-    <p class="text-gray-600">You have no shipments yet.</p>
+  <p class="text-gray-600">
+    You have no shipments yet.
+    <a href="/shipment/create" class="text-blue-600 hover:underline"
+      >Create one</a
+    >.
+  </p>
   <% } else { %>
-    <div class="grid gap-6">
-      <% shipments.forEach(shipment => { %>
-        <div class="bg-white shadow rounded p-4">
-          <div class="flex justify-between items-center mb-2">
-            <h2 class="text-xl font-semibold">Shipment #<%= shipment.id %></h2>
-            <% if (!shipment.finalised) { %>
-              <div>
-                <a href="/shipment/edit/<%= shipment.id %>" class="text-blue-600 hover:underline mr-4">Edit</a>
-                <form action="/shipment/delete/<%= shipment.id %>" method="POST" style="display:inline;">
-                  <button type="submit" onclick="return confirm('Delete this shipment?')" class="text-red-600 hover:underline">Delete</button>
-                </form>
-              </div>
-            <% } else { %>
-              <span class="text-green-600 font-medium">Finalised</span>
-            <% } %>
-          </div>
-
-          <p><strong>Order ID:</strong> <%= shipment.orderId %></p>
-          <p><strong>Method:</strong> <%= shipment.method %></p>
-          <p><strong>Date:</strong> <%= shipment.shipmentDate %></p>
-
-          <% if (shipment.Address) { %>
-            <p><strong>Address:</strong> <%= shipment.Address.label %> — <%= shipment.Address.street %>, <%= shipment.Address.city %>, <%= shipment.Address.postcode %>, <%= shipment.Address.country %></p>
-          <% } %>
+  <div class="grid gap-6">
+    <% shipments.forEach(shipment => { %>
+    <div class="bg-white shadow rounded p-4">
+      <div class="flex justify-between items-center mb-2">
+        <h2 class="text-xl font-semibold">Shipment #<%= shipment.id %></h2>
+        <% if (!shipment.finalised) { %>
+        <div>
+          <a
+            href="/shipment/edit/<%= shipment.id %>"
+            class="text-blue-600 hover:underline mr-4"
+            >Edit</a
+          >
+          <form
+            action="/shipment/delete/<%= shipment.id %>"
+            method="POST"
+            style="display: inline"
+          >
+            <button
+              type="submit"
+              onclick="return confirm('Delete this shipment?')"
+              class="text-red-600 hover:underline"
+            >
+              Delete
+            </button>
+          </form>
         </div>
-      <% }) %>
+        <% } else { %>
+        <span class="text-green-600 font-medium">Finalised</span>
+        <% } %>
+      </div>
+
+      <p>
+        <strong>Order ID:</strong>
+        <a
+          href="/orders/view/<%= shipment.orderId %>"
+          class="text-blue-600 hover:underline"
+          ><%= shipment.orderId %></a
+        >
+      </p>
+      <p><strong>Method:</strong> <%= shipment.method %></p>
+      <p><strong>Date:</strong> <%= shipment.shipmentDate %></p>
+
+      <% if (shipment.Address) { %>
+      <p>
+        <strong>Address:</strong> <%= shipment.Address.label %> — <%=
+        shipment.Address.street %>, <%= shipment.Address.city %>, <%=
+        shipment.Address.postcode %>, <%= shipment.Address.country %>
+      </p>
+      <% } %>
     </div>
+    <% }) %>
+  </div>
   <% } %>
 </div>
 

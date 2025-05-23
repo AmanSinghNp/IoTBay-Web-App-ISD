@@ -105,34 +105,17 @@ exports.showDashboard = async (req, res) => {
   }
 };
 
-// View user access logs with optional date filtering
+// View user access logs
 exports.viewAccessLogs = async (req, res) => {
   if (!req.session.userId) return res.redirect("/login");
 
-  const { date } = req.query;
-  const where = { userId: req.session.userId };
-
-  if (date) {
-    const start = new Date(date);
-    const end = new Date(date);
-    end.setDate(end.getDate() + 1); // Include logs up to next day's midnight
-
-    where.loginTime = {
-      [Op.gte]: start,
-      [Op.lt]: end,
-    };
-  }
-
   try {
     const logs = await UserAccessLog.findAll({
-      where,
+      where: { userId: req.session.userId },
       order: [["loginTime", "DESC"]],
     });
 
-    return res.render("access_logs", {
-      logs,
-      filterDate: date || null,
-    });
+    return res.render("access_log", { logs });
   } catch (err) {
     console.error("Failed to load access logs:", err);
     return res.status(500).send("Could not retrieve access log data.");

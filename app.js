@@ -104,7 +104,7 @@ app.get("/dashboard", (req, res) => {
 
 // DB sync + server start
 sequelize
-  .sync({ alter: true })
+  .sync()
   .then(() => {
     console.log("✅ Database synced");
     app.listen(PORT, () => {

@@ -101,10 +101,11 @@ exports.logout = async (req, res) => {
       }
     }
 
-    req.session.destroy();
-    res.redirect("/");
+    req.session.destroy(() => {
+      res.redirect("/");
+    });
   } catch (err) {
-    console.error(err);
+    console.error("Logout error:", err);
     res.redirect("/");
   }
 };

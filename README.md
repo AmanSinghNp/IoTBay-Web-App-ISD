@@ -113,3 +113,30 @@ The application includes two pre-seeded users for testing:
 You can log in using the `/login` page on the site.
 
 To create more users, register from the `/register` page. New accounts are customer role by default.
+
+## 🧪 Testing
+
+### Running Tests
+
+The application includes automated tests for key features. To run all tests:
+
+```bash
+npm test
+```
+
+To run specific tests:
+
+```bash
+# Run access log basic tests
+npm run test:access
+
+# Run access log flow tests
+npm run test:access-flow
+```
+
+### Test Structure
+
+Tests are organized in the `/tests` directory:
+
+- `access-log.test.js`: Tests basic access log functionality
+- `access-log-flow.test.js`: Tests the complete access log user flow

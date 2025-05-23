@@ -3,6 +3,7 @@ const Order = require("../models/order");
 const Device = require("../models/device");
 const Payment = require("../models/payment");
 const Shipment = require("../models/shipment");
+const OrderItem = require("../models/orderItem");
 
 // View list of customer's orders
 exports.viewOrders = async (req, res) => {
@@ -13,7 +14,12 @@ exports.viewOrders = async (req, res) => {
   try {
     const orders = await Order.findAll({
       where: { userId: req.session.userId },
-      include: [Device], // Include device details
+      include: [
+        {
+          model: OrderItem,
+          include: [Device],
+        },
+      ],
       order: [["createdAt", "DESC"]],
     });
 
@@ -145,7 +151,14 @@ exports.viewOrderDetails = async (req, res) => {
 
   try {
     const order = await Order.findByPk(orderId, {
-      include: [Device, Payment, Shipment],
+      include: [
+        {
+          model: OrderItem,
+          include: [Device],
+        },
+        Payment,
+        Shipment,
+      ],
     });
 
     if (!order || order.userId !== req.session.userId) {

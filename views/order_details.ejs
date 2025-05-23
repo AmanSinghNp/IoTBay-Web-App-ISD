@@ -6,79 +6,142 @@
       Order #<%= order.id %> Details
     </h2>
 
-    <ul class="space-y-4 text-gray-700 text-sm">
-      <li><strong>Status:</strong> <%= order.status %></li>
-      <li>
-        <strong>Ordered At:</strong> <%= new
-        Date(order.createdAt).toLocaleString() %>
-      </li>
-      <li>
-        <strong>Device:</strong> <%= order.Device.name %> by <%=
-        order.Device.brand %>
-      </li>
-      <li><strong>Catalog:</strong> <%= order.Device.catalog %></li>
-      <li><strong>Quantity:</strong> <%= order.quantity %></li>
-      <li>
-        <strong>Price per item:</strong> $<%= order.Device.price.toFixed(2) %>
-      </li>
-      <li>
-        <strong>Total:</strong> $<%= (order.quantity *
-        order.Device.price).toFixed(2) %>
-      </li>
-    </ul>
+    <div class="space-y-4">
+      <div class="bg-gray-50 p-4 rounded-md">
+        <h3 class="font-semibold text-gray-900 mb-2">Order Information</h3>
+        <ul class="space-y-2 text-sm">
+          <li class="flex justify-between">
+            <span class="text-gray-600">Status:</span>
+            <span
+              class="font-medium <%= order.status === 'Placed' ? 'text-green-600' : order.status === 'Cancelled' ? 'text-red-600' : 'text-gray-600' %>"
+            >
+              <%= order.status %>
+            </span>
+          </li>
+          <li class="flex justify-between">
+            <span class="text-gray-600">Order Date:</span>
+            <span class="font-medium"
+              ><%= new Date(order.createdAt).toLocaleString() %></span
+            >
+          </li>
+          <% if (order.anonymousEmail) { %>
+          <li class="flex justify-between">
+            <span class="text-gray-600">Contact Email:</span>
+            <span class="font-medium"><%= order.anonymousEmail %></span>
+          </li>
+          <% } %>
+        </ul>
+      </div>
 
-    <h3 class="font-semibold mb-2">Order Items</h3>
-    <ul class="space-y-2 text-gray-700 text-sm">
-      <% order.OrderItems.forEach(function(item) { %>
-      <li>
-        <strong>Device:</strong> <%= item.Device.name %> (<%= item.Device.brand
-        %>)<br />
-        <strong>Quantity:</strong> <%= item.quantity %><br />
-        <strong>Price per item:</strong> $<%= item.price.toFixed(2) %><br />
-        <strong>Subtotal:</strong> $<%= (item.price * item.quantity).toFixed(2)
-        %>
-      </li>
-      <% }); %>
-    </ul>
+      <div class="mt-6">
+        <h3 class="font-semibold text-gray-900 mb-3">Order Items</h3>
+        <div class="divide-y divide-gray-200">
+          <% let orderTotal = 0; %> <% order.OrderItems.forEach(function(item) {
+          const itemTotal = item.price * item.quantity; orderTotal += itemTotal;
+          %>
+          <div class="py-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <h4 class="font-medium text-gray-900">
+                  <%= item.Device.name %>
+                </h4>
+                <p class="text-sm text-gray-500">
+                  <%= item.Device.brand %> · <%= item.Device.catalog %>
+                </p>
+                <p class="mt-1 text-sm">
+                  <span class="text-gray-600"
+                    ><%= item.quantity %> × $<%= item.price.toFixed(2) %></span
+                  >
+                </p>
+              </div>
+              <span class="font-medium">$<%= itemTotal.toFixed(2) %></span>
+            </div>
+          </div>
+          <% }); %>
 
-    <% if (order.Payment) { %>
-    <div class="mt-4 p-4 bg-blue-50 rounded">
-      <h3 class="font-semibold mb-2">Payment Info</h3>
-      <p><strong>Method:</strong> <%= order.Payment.paymentMethod %></p>
-      <p><strong>Status:</strong> <%= order.Payment.status %></p>
-      <p><strong>Amount:</strong> $<%= order.Payment.amount.toFixed(2) %></p>
-      <p><strong>Transaction ID:</strong> <%= order.Payment.transactionId %></p>
+          <div class="py-4">
+            <div class="flex justify-between">
+              <span class="font-semibold">Order Total:</span>
+              <span class="font-semibold">$<%= orderTotal.toFixed(2) %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <% if (order.Payment) { %>
+      <div class="mt-4 p-4 bg-blue-50 rounded">
+        <h3 class="font-semibold mb-2">Payment Info</h3>
+        <ul class="space-y-1 text-sm">
+          <li class="flex justify-between">
+            <span class="text-gray-600">Method:</span>
+            <span><%= order.Payment.paymentMethod %></span>
+          </li>
+          <li class="flex justify-between">
+            <span class="text-gray-600">Status:</span>
+            <span><%= order.Payment.status %></span>
+          </li>
+          <li class="flex justify-between">
+            <span class="text-gray-600">Amount:</span>
+            <span>$<%= order.Payment.amount.toFixed(2) %></span>
+          </li>
+          <li class="flex justify-between">
+            <span class="text-gray-600">Transaction ID:</span>
+            <span class="font-mono text-xs"
+              ><%= order.Payment.transactionId %></span
+            >
+          </li>
+        </ul>
+      </div>
+      <% } %> <% if (order.Shipment) { %>
+      <div class="mt-4 p-4 bg-green-50 rounded">
+        <h3 class="font-semibold mb-2">Shipment Info</h3>
+        <ul class="space-y-1 text-sm">
+          <li class="flex justify-between">
+            <span class="text-gray-600">Method:</span>
+            <span><%= order.Shipment.method %></span>
+          </li>
+          <li class="flex justify-between">
+            <span class="text-gray-600">Date:</span>
+            <span><%= order.Shipment.shipmentDate %></span>
+          </li>
+          <li class="flex justify-between">
+            <span class="text-gray-600">Finalised:</span>
+            <span><%= order.Shipment.finalised ? 'Yes' : 'No' %></span>
+          </li>
+        </ul>
+      </div>
+      <% } %>
     </div>
-    <% } %> <% if (order.Shipment) { %>
-    <div class="mt-4 p-4 bg-green-50 rounded">
-      <h3 class="font-semibold mb-2">Shipment Info</h3>
-      <p><strong>Method:</strong> <%= order.Shipment.method %></p>
-      <p><strong>Date:</strong> <%= order.Shipment.shipmentDate %></p>
-      <p>
-        <strong>Finalised:</strong> <%= order.Shipment.finalised ? 'Yes' : 'No'
-        %>
-      </p>
-    </div>
-    <% } %>
 
     <div class="mt-6 flex justify-between">
-      <a href="/orders" class="text-blue-600 hover:underline"
-        >← Back to Orders</a
+      <a
+        href="<%= locals.anonymousId ? '/' : '/orders' %>"
+        class="text-blue-600 hover:underline"
       >
+        <%= locals.anonymousId ? '← Back to Homepage' : '← Back to Orders' %>
+      </a>
 
-      <% if (order.status === "Placed") { %>
-      <form
-        action="/orders/cancel/<%= order.id %>"
-        method="POST"
-        onsubmit="return confirm('Are you sure you want to cancel this order?');"
-      >
-        <button
-          class="bg-red-600 text-white text-sm px-4 py-2 rounded hover:bg-red-700"
+      <div class="flex gap-2">
+        <% if (order.status === "Placed") { %>
+        <a
+          href="/orders/edit/<%= order.id %><%= locals.anonymousId ? '?anonymousId=' + anonymousId : '' %>"
+          class="bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-700"
         >
-          Cancel Order
-        </button>
-      </form>
-      <% } %>
+          Edit Order
+        </a>
+        <form
+          action="/orders/cancel/<%= order.id %><%= locals.anonymousId ? '?anonymousId=' + anonymousId : '' %>"
+          method="POST"
+          onsubmit="return confirm('Are you sure you want to cancel this order?');"
+        >
+          <button
+            class="bg-red-600 text-white text-sm px-4 py-2 rounded hover:bg-red-700"
+          >
+            Cancel Order
+          </button>
+        </form>
+        <% } %>
+      </div>
     </div>
   </div>
 </section>

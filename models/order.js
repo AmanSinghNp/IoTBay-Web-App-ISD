@@ -9,6 +9,17 @@ const Order = sequelize.define("Order", {
     type: DataTypes.ENUM("Placed", "Cancelled", "Completed"),
     defaultValue: "Placed",
   },
+  anonymousId: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  anonymousEmail: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    validate: {
+      isEmail: true,
+    },
+  },
 });
 
 // Set up relationships

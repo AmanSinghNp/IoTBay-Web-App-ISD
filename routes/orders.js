@@ -9,6 +9,9 @@ router.get("/orders", orderController.viewOrders);
 // Create a new order (via form submission)
 router.post("/orders/new", orderController.createOrder);
 
+// Get form to edit an order
+router.get("/orders/edit/:id", orderController.getEditOrderForm);
+
 // Update an order's quantity
 router.post("/orders/update/:id", orderController.updateOrder);
 

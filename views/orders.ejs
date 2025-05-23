@@ -4,6 +4,73 @@
   <div class="max-w-6xl mx-auto bg-white p-6 rounded-lg shadow-md">
     <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">My Orders</h2>
 
+    <!-- Search Form -->
+    <div class="mb-6 bg-gray-50 p-4 rounded-lg">
+      <h3 class="text-lg font-semibold mb-3">Search Orders</h3>
+      <form
+        action="/orders"
+        method="GET"
+        class="flex flex-wrap gap-3 items-end"
+      >
+        <div class="flex-1 min-w-[200px]">
+          <label
+            for="orderNumber"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Order Number</label
+          >
+          <input
+            type="number"
+            id="orderNumber"
+            name="orderNumber"
+            value="<%= locals.searchParams?.orderNumber || '' %>"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+        </div>
+        <div class="flex-1 min-w-[200px]">
+          <label
+            for="startDate"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >From Date</label
+          >
+          <input
+            type="date"
+            id="startDate"
+            name="startDate"
+            value="<%= locals.searchParams?.startDate || '' %>"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+        </div>
+        <div class="flex-1 min-w-[200px]">
+          <label
+            for="endDate"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >To Date</label
+          >
+          <input
+            type="date"
+            id="endDate"
+            name="endDate"
+            value="<%= locals.searchParams?.endDate || '' %>"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+        </div>
+        <div class="flex gap-2">
+          <button
+            type="submit"
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            Search
+          </button>
+          <a
+            href="/orders"
+            class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Clear
+          </a>
+        </div>
+      </form>
+    </div>
+
     <% if (orders.length === 0) { %>
     <p class="text-center text-gray-500">You have no orders yet.</p>
     <% } else { %>
@@ -13,6 +80,7 @@
           <tr
             class="bg-gray-100 text-left text-gray-600 uppercase text-sm leading-normal"
           >
+            <th class="py-3 px-6">Order #</th>
             <th class="py-3 px-6">Device</th>
             <th class="py-3 px-6">Quantity</th>
             <th class="py-3 px-6">Status</th>
@@ -23,6 +91,8 @@
         <tbody class="text-gray-600 text-sm font-light">
           <% orders.forEach(order => { %>
           <tr class="border-b border-gray-200 hover:bg-gray-100">
+            <td class="py-3 px-6 whitespace-nowrap"><%= order.id %></td>
+
             <!-- Link to view order details -->
             <td class="py-3 px-6 whitespace-nowrap">
               <a
@@ -56,6 +126,14 @@
             <td class="py-3 px-6 text-center">
               <% if (order.status === 'Placed') { %>
               <div class="flex flex-col sm:flex-row justify-center gap-2">
+                <!-- Edit Button -->
+                <a
+                  href="/orders/edit/<%= order.id %>"
+                  class="bg-blue-500 text-white text-xs px-3 py-1 rounded hover:bg-blue-600"
+                >
+                  Edit
+                </a>
+
                 <!-- Cancel Button -->
                 <form
                   action="/orders/cancel/<%= order.id %>"

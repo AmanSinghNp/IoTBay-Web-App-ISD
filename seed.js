@@ -424,13 +424,154 @@ function createAccessLogs(userId) {
   return logs;
 }
 
+// Create dummy orders for the customer
+function createCustomerOrders(userId) {
+  const now = new Date();
+  const sixMonthsAgo = new Date(now);
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+  // Order statuses
+  const statuses = ["Placed", "Completed", "Cancelled"];
+
+  // Create orders array
+  const orders = [
+    // Recent orders with different statuses
+    {
+      userId,
+      status: "Placed",
+      createdAt: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+      updatedAt: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000),
+    },
+    {
+      userId,
+      status: "Completed",
+      createdAt: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+      updatedAt: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000), // Completed 2 days later
+    },
+    {
+      userId,
+      status: "Cancelled",
+      createdAt: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000), // 1 week ago
+      updatedAt: new Date(now.getTime() - 6 * 24 * 60 * 60 * 1000), // Cancelled 1 day later
+    },
+
+    // Orders from last month
+    {
+      userId,
+      status: "Completed",
+      createdAt: new Date(now.getFullYear(), now.getMonth() - 1, 5), // 5th of last month
+      updatedAt: new Date(now.getFullYear(), now.getMonth() - 1, 8), // Completed 3 days later
+    },
+    {
+      userId,
+      status: "Completed",
+      createdAt: new Date(now.getFullYear(), now.getMonth() - 1, 15), // 15th of last month
+      updatedAt: new Date(now.getFullYear(), now.getMonth() - 1, 18), // Completed 3 days later
+    },
+
+    // Orders from 2 months ago
+    {
+      userId,
+      status: "Completed",
+      createdAt: new Date(now.getFullYear(), now.getMonth() - 2, 10), // 10th of 2 months ago
+      updatedAt: new Date(now.getFullYear(), now.getMonth() - 2, 12), // Completed 2 days later
+    },
+
+    // Orders from 3-6 months ago (for history)
+    {
+      userId,
+      status: "Completed",
+      createdAt: new Date(now.getFullYear(), now.getMonth() - 3, 22), // 22nd of 3 months ago
+      updatedAt: new Date(now.getFullYear(), now.getMonth() - 3, 25), // Completed 3 days later
+    },
+    {
+      userId,
+      status: "Cancelled",
+      createdAt: new Date(now.getFullYear(), now.getMonth() - 4, 12), // 12th of 4 months ago
+      updatedAt: new Date(now.getFullYear(), now.getMonth() - 4, 12), // Cancelled same day
+    },
+    {
+      userId,
+      status: "Completed",
+      createdAt: new Date(now.getFullYear(), now.getMonth() - 5, 3), // 3rd of 5 months ago
+      updatedAt: new Date(now.getFullYear(), now.getMonth() - 5, 7), // Completed 4 days later
+    },
+    {
+      userId,
+      status: "Completed",
+      createdAt: new Date(now.getFullYear(), now.getMonth() - 6, 18), // 18th of 6 months ago
+      updatedAt: new Date(now.getFullYear(), now.getMonth() - 6, 21), // Completed 3 days later
+    },
+  ];
+
+  return orders;
+}
+
+// Create order items for the orders
+async function createOrderItems(orders, devices) {
+  const orderItems = [];
+
+  for (const order of orders) {
+    // Get 1-3 random devices for this order
+    const numItems = 1 + Math.floor(Math.random() * 3);
+    const orderDevices = [];
+
+    // Make sure we don't add the same device twice to an order
+    while (orderDevices.length < numItems) {
+      const randomDevice = devices[Math.floor(Math.random() * devices.length)];
+      if (!orderDevices.find((d) => d.id === randomDevice.id)) {
+        orderDevices.push(randomDevice);
+      }
+    }
+
+    // Create order items for each device
+    for (const device of orderDevices) {
+      const quantity = 1 + Math.floor(Math.random() * 3); // 1-3 of each item
+
+      orderItems.push({
+        orderId: order.id,
+        deviceId: device.id,
+        quantity,
+        price: device.price,
+      });
+    }
+  }
+
+  return orderItems;
+}
+
+// Create payments for completed orders
+function createPayments(orders) {
+  const payments = [];
+
+  const paymentMethods = ["Credit Card", "PayPal", "Bank Transfer"];
+
+  for (const order of orders) {
+    // Only create payments for completed orders
+    if (order.status === "Completed") {
+      payments.push({
+        orderId: order.id,
+        paymentMethod:
+          paymentMethods[Math.floor(Math.random() * paymentMethods.length)],
+        status: "Successful",
+        amount: (Math.random() * 500 + 50).toFixed(2), // Random amount $50-$550
+        transactionId: `txn_${Math.random().toString(36).substring(2, 15)}`,
+        createdAt: order.updatedAt, // Payment created when order was completed
+        updatedAt: order.updatedAt,
+      });
+    }
+  }
+
+  return payments;
+}
+
 (async () => {
   try {
     // Drop & recreate tables
     await sequelize.sync({ force: true });
 
     // Insert our dummy devices
-    await Device.bulkCreate(dummyDevices);
+    const devices = await Device.bulkCreate(dummyDevices);
 
     // Hash passwords for dummy users
     for (const user of dummyUsers) {
@@ -449,14 +590,38 @@ function createAccessLogs(userId) {
     // Insert access logs
     await UserAccessLog.bulkCreate(accessLogs);
 
+    // Create customer orders (for John Doe, ID 2)
+    const customerOrders = createCustomerOrders(2);
+
+    // Insert orders
+    const orders = await Order.bulkCreate(customerOrders);
+
+    // Create order items for each order
+    const orderItems = await createOrderItems(orders, devices);
+
+    // Insert order items
+    await OrderItem.bulkCreate(orderItems);
+
+    // Create payments for completed orders
+    const payments = createPayments(orders);
+
+    // Insert payments
+    await Payment.bulkCreate(payments);
+
     console.log(
       "✅  Seeding complete. You now have",
       dummyDevices.length,
       "devices,",
       dummyUsers.length,
-      "users, and",
+      "users,",
       accessLogs.length,
-      "access logs."
+      "access logs,",
+      orders.length,
+      "orders,",
+      orderItems.length,
+      "order items, and",
+      payments.length,
+      "payments."
     );
     process.exit(0);
   } catch (err) {

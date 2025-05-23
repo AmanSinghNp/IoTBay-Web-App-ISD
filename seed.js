@@ -376,6 +376,54 @@ const dummyUsers = [
   },
 ];
 
+// Function to generate a random date between start and end dates
+function randomDate(start, end) {
+  return new Date(
+    start.getTime() + Math.random() * (end.getTime() - start.getTime())
+  );
+}
+
+// Create dummy access logs for the past week
+function createAccessLogs(userId) {
+  const now = new Date();
+  const oneWeekAgo = new Date(now);
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+  const logs = [];
+
+  // Create 5-10 random access logs per user
+  const numLogs = 5 + Math.floor(Math.random() * 6);
+
+  for (let i = 0; i < numLogs; i++) {
+    // Create login time (random time in the past week)
+    const loginTime = randomDate(oneWeekAgo, now);
+
+    // Create logout time (15 min to 2 hours after login)
+    const logoutTime = new Date(loginTime);
+    logoutTime.setMinutes(
+      loginTime.getMinutes() + 15 + Math.floor(Math.random() * 105)
+    );
+
+    // Add log
+    logs.push({
+      userId,
+      loginTime,
+      logoutTime,
+    });
+  }
+
+  // Add one active session for the admin (no logout time)
+  if (userId === 1) {
+    logs.push({
+      userId,
+      loginTime: new Date(),
+      logoutTime: null, // Active session
+    });
+  }
+
+  return logs;
+}
+
 (async () => {
   try {
     // Drop & recreate tables
@@ -390,14 +438,25 @@ const dummyUsers = [
     }
 
     // Insert our dummy users
-    await User.bulkCreate(dummyUsers);
+    const users = await User.bulkCreate(dummyUsers);
+
+    // Create access logs for each user
+    const accessLogs = [
+      ...createAccessLogs(1), // Admin user (ID 1)
+      ...createAccessLogs(2), // Customer user (ID 2)
+    ];
+
+    // Insert access logs
+    await UserAccessLog.bulkCreate(accessLogs);
 
     console.log(
       "✅  Seeding complete. You now have",
       dummyDevices.length,
-      "devices and",
+      "devices,",
       dummyUsers.length,
-      "users."
+      "users, and",
+      accessLogs.length,
+      "access logs."
     );
     process.exit(0);
   } catch (err) {

@@ -40,6 +40,7 @@ const shipmentRoutes = require("./routes/shipment");
 const addressRoutes = require("./routes/address");
 const productRoutes = require("./routes/product");
 const cartRoutes = require("./routes/cart");
+const adminUserRoutes = require("./routes/adminUsers"); // Admin user management
 
 const app = express();
 const PORT = 3000;
@@ -94,6 +95,7 @@ app.use("/", productRoutes);
 app.use("/", deliveryRoutes);
 app.use("/", shipmentRoutes);
 app.use("/", addressRoutes);
+app.use("/admin/users", adminUserRoutes); // Admin user management
 
 // Home route
 app.get("/", (req, res) => {

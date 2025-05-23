@@ -24,3 +24,12 @@ module.exports.isAdmin = (req, res, next) => {
   }
   next();
 };
+
+// Admin-only access for user management
+module.exports.isAdminOnly = (req, res, next) => {
+  if (!req.session.userRole || req.session.userRole !== "staff") {
+    req.flash("error", "Access denied. Admin privileges required.");
+    return res.redirect("/dashboard");
+  }
+  next();
+};

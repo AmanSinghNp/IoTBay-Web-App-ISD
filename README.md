@@ -31,6 +31,12 @@ The system follows the **MVC (Model–View–Controller)** design pattern and is
 - Edit or delete devices
 - View all products with admin controls
 - Role-based access control
+- **User Management System (Feature 4)**
+  - Create and manage user accounts
+  - Search and filter users by name/phone
+  - Update user details and roles
+  - Activate/deactivate user accounts
+  - View user statistics and analytics
 
 ---
 
@@ -94,9 +100,23 @@ http://localhost:3000
 
 ## 🔐 Login Instructions
 
-The application includes two pre-seeded users for testing:
+The application includes pre-seeded users for testing:
 
-### Staff User
+### Staff User (User Management Access)
+
+- **Email**: staff@iotbay.com
+- **Password**: staff123
+- **Role**: Staff
+- **Permissions**:
+  - Can add, edit, and delete devices
+  - **Full User Management System access** (Feature 4)
+    - Create new users (customer and staff types)
+    - View, search, and filter user records
+    - Update user details and roles
+    - Activate/deactivate user accounts
+    - Delete users
+
+### Legacy Staff User
 
 - **Email**: admin@example.com
 - **Password**: 123456
@@ -112,7 +132,24 @@ The application includes two pre-seeded users for testing:
 
 You can log in using the `/login` page on the site.
 
-To create more users, register from the `/register` page. New accounts are customer role by default.
+To create more users, register from the `/register` page or use the **User Management System** (staff only) at `/admin/users`.
+
+### 🆕 User Management System
+
+Staff users can access the comprehensive User Management system by:
+
+- Navigating to `/admin/users` directly
+- Using the "User Management" card on the dashboard
+- Clicking "User Management" in the sidebar
+
+**Features include:**
+
+- Search users by full name and phone number
+- View user statistics and analytics
+- Create, edit, and delete user accounts
+- Toggle user active/inactive status
+- Role management (Customer/Staff)
+- Modern responsive UI with pagination
 
 ## 🧪 Testing
 

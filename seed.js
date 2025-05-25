@@ -363,10 +363,17 @@ const dummyDevices = [
 
 const dummyUsers = [
   {
-    fullName: "Admin User",
-    email: "admin@example.com",
-    password: "123456",
+    fullName: "System Administrator",
+    email: "admin@iotbay.com",
+    password: "admin123",
     phone: "1234567890",
+    role: "staff",
+  },
+  {
+    fullName: "Staff Manager",
+    email: "staff@iotbay.com",
+    password: "staff123",
+    phone: "1234567891",
     role: "staff",
   },
   {
@@ -374,6 +381,13 @@ const dummyUsers = [
     email: "john@example.com",
     password: "123456",
     phone: "0987654321",
+    role: "customer",
+  },
+  {
+    fullName: "Jane Smith",
+    email: "jane@example.com",
+    password: "123456",
+    phone: "0987654322",
     role: "customer",
   },
 ];
@@ -719,17 +733,18 @@ function insertSQLitePaymentRecords(paymentRecords) {
     // Insert our dummy users
     const users = await User.bulkCreate(dummyUsers);
 
-    // Create access logs for each user
-    const accessLogs = [
-      ...createAccessLogs(1), // Admin user (ID 1)
-      ...createAccessLogs(2), // Customer user (ID 2)
-    ];
+    // Create access logs for each user using actual user IDs
+    const accessLogs = [];
+    users.forEach((user) => {
+      accessLogs.push(...createAccessLogs(user.id));
+    });
 
     // Insert access logs
     await UserAccessLog.bulkCreate(accessLogs);
 
-    // Create customer orders (for John Doe, ID 2)
-    const customerOrders = createCustomerOrders(2);
+    // Create customer orders (for John Doe)
+    const johnDoe = users.find((user) => user.email === "john@example.com");
+    const customerOrders = createCustomerOrders(johnDoe.id);
 
     // Insert orders
     const orders = await Order.bulkCreate(customerOrders);
@@ -741,7 +756,7 @@ function insertSQLitePaymentRecords(paymentRecords) {
     await OrderItem.bulkCreate(orderItems);
 
     // Create sample addresses for users
-    const addresses = createSampleAddresses(2);
+    const addresses = createSampleAddresses(johnDoe.id);
 
     // Insert addresses
     const createdAddresses = await Address.bulkCreate(addresses);
@@ -755,7 +770,7 @@ function insertSQLitePaymentRecords(paymentRecords) {
     await Shipment.bulkCreate(shipments);
 
     // Create SQLite payment records for the new payment management system
-    const sqlitePaymentRecords = createSQLitePaymentRecords(orders, 2);
+    const sqlitePaymentRecords = createSQLitePaymentRecords(orders, johnDoe.id);
 
     // Insert SQLite payment records
     await insertSQLitePaymentRecords(sqlitePaymentRecords);

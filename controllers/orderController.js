@@ -432,7 +432,6 @@ exports.viewOrderDetails = async (req, res) => {
           model: OrderItem,
           include: [Device],
         },
-        Payment,
         Shipment,
       ],
     });
@@ -457,7 +456,17 @@ exports.viewOrderDetails = async (req, res) => {
       return res.status(403).send("Unauthorized.");
     }
 
-    res.render("order_details", { order, anonymousId });
+    // Load payment information using SQLite Payment model
+    Payment.findByOrderId(orderId, (err, payment) => {
+      if (err) {
+        console.error("Error loading payment:", err);
+      }
+
+      // Attach payment to order object for template
+      order.payment = payment;
+
+      res.render("order_details", { order, anonymousId });
+    });
   } catch (err) {
     console.error(err);
     res.status(500).send("Failed to load order details.");

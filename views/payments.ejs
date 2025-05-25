@@ -53,8 +53,7 @@
                 </div>
                 <form action="/cart/remove/<%= item.id %>" method="POST" class="remove-btn mt-2">
                   <button type="submit"
-                          class="text-red-600 hover:text-red-800 font-medium"
-                          onclick="return confirm('Remove this item from cart?');">
+                          class="text-red-600 hover:text-red-800 font-medium">
                     Remove
                   </button>
                 </form>
@@ -78,7 +77,8 @@
         <h1 class="text-2xl font-bold mb-4">Payment Information</h1>
         
         <!-- Error message container -->
-        <div id="formError" class="hidden mb-4 p-3 bg-red-50 border-l-4 border-red-500">
+        <% if (typeof errors !== 'undefined' && errors && errors.length > 0) { %>
+        <div class="mb-4 p-3 bg-red-50 border-l-4 border-red-500">
           <div class="flex">
             <div class="flex-shrink-0">
               <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
@@ -86,106 +86,111 @@
               </svg>
             </div>
             <div class="ml-3">
-              <p id="errorMessage" class="text-sm text-red-700"></p>
+              <ul class="text-sm text-red-700">
+                <% errors.forEach(function(error) { %>
+                  <li><%= typeof error === 'object' ? error.msg : error %></li>
+                <% }); %>
+              </ul>
             </div>
           </div>
         </div>
+        <% } %>
 
-        <!-- Payment Method Selection -->
-        <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
-          <div class="grid grid-cols-2 gap-3">
-            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:border-blue-500">
-              <input type="radio" name="paymentMethod" value="creditCard" checked class="h-4 w-4 text-blue-600">
-              <span class="ml-2">Credit Card</span>
-            </label>
-            <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:border-blue-500">
-              <input type="radio" name="paymentMethod" value="paypal" class="h-4 w-4 text-blue-600">
-              <span class="ml-2">PayPal</span>
-            </label>
+        <form action="/payments/new" method="POST">
+          <!-- Payment Method Selection -->
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+            <div class="grid grid-cols-2 gap-3">
+              <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:border-blue-500">
+                <input type="radio" name="payment_method" value="Credit Card" checked class="h-4 w-4 text-blue-600">
+                <span class="ml-2">Credit Card</span>
+              </label>
+              <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:border-blue-500">
+                <input type="radio" name="payment_method" value="PayPal" class="h-4 w-4 text-blue-600">
+                <span class="ml-2">PayPal</span>
+              </label>
+            </div>
           </div>
-        </div>
 
-        <!-- Credit Card Form -->
-        <div id="creditCardForm" class="space-y-4">
-          <div>
-            <label for="cardNumber" class="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
-            <input type="text" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456"
-                   class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <p id="cardNumberError" class="mt-1 text-sm text-red-600 hidden">Please enter a valid card number</p>
-          </div>
-          
-          <div class="grid grid-cols-2 gap-4">
+          <!-- Credit Card Form -->
+          <div id="creditCardForm" class="space-y-4">
             <div>
-              <label for="expiryDate" class="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
-              <input type="text" id="expiryDate" name="expiryDate" placeholder="MM/YY"
+              <label for="card_number" class="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
+              <input type="text" id="card_number" name="card_number" placeholder="1234 5678 9012 3456"
                      class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <p id="expiryDateError" class="mt-1 text-sm text-red-600 hidden">Please enter a valid expiry date</p>
             </div>
-            <div>
-              <label for="cvv" class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
-              <input type="text" id="cvv" name="cvv" placeholder="123"
-                     class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <p id="cvvError" class="mt-1 text-sm text-red-600 hidden">Please enter a valid CVV</p>
-            </div>
-          </div>
-          
-          <div>
-            <label for="cardName" class="block text-sm font-medium text-gray-700 mb-1">Name on Card</label>
-            <input type="text" id="cardName" name="cardName" placeholder="John Smith"
-                   class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <p id="cardNameError" class="mt-1 text-sm text-red-600 hidden">Please enter the name on card</p>
-          </div>
-        </div>
-
-        <!-- PayPal Form (hidden by default) -->
-        <div id="paypalForm" class="hidden">
-          <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
-            <div class="flex">
-              <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                </svg>
+            
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="expiry_date" class="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
+                <input type="text" id="expiry_date" name="expiry_date" placeholder="MM/YY"
+                       class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
               </div>
-              <div class="ml-3">
-                <p class="text-sm text-yellow-700">
-                  You will be redirected to PayPal to complete your payment after clicking "Pay Now".
-                </p>
+              <div>
+                <label for="cvv" class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
+                <input type="text" id="cvv" name="cvv" placeholder="123"
+                       class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
               </div>
             </div>
+            
+            <div>
+              <label for="cardName" class="block text-sm font-medium text-gray-700 mb-1">Name on Card</label>
+              <input type="text" id="cardName" name="cardName" placeholder="John Smith"
+                     class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
           </div>
-        </div>
 
-        <!-- Terms and Conditions -->
-        <div class="mt-6 flex items-start">
-          <div class="flex items-center h-5">
-            <input id="terms" name="terms" type="checkbox"
-                  class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
+          <!-- PayPal Form (hidden by default) -->
+          <div id="paypalForm" class="hidden">
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm text-yellow-700">
+                    You will be redirected to PayPal to complete your payment after clicking "Pay Now".
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="ml-3 text-sm">
-            <label for="terms" class="font-medium text-gray-700">I agree to the</label>
-            <a href="/terms" class="text-blue-600 hover:underline"> terms and conditions</a>
-            <p id="termsError" class="mt-1 text-sm text-red-600 hidden">You must agree to the terms and conditions</p>
-          </div>
-        </div>
 
-        <!-- Pay Now Button -->
-        <button type="submit" id="payNowBtn"
-        class="mt-6 w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium disabled:opacity-50 disabled:cursor-not-allowed relative group"
-        <%= !cartItems.length ? 'disabled' : '' %>>
-          Pay Now $<%= cartItems.reduce((sum, item) => sum + item.Device.price * item.quantity, 0).toFixed(2) %>
-          <% if (!cartItems.length) { %>
-            <span class="absolute invisible group-hover:visible w-48 bg-gray-800 text-white text-center rounded py-1 px-3 bottom-full left-1/2 transform -translate-x-1/2 mb-2">
-              Your cart is empty. Add items to proceed.
-            </span>
-          <% } %>
-        </button>
+          <!-- Hidden fields for amount and payment date -->
+          <input type="hidden" name="amount" value="<%= cartItems.reduce((sum, item) => sum + item.Device.price * item.quantity, 0).toFixed(2) %>">
+          <input type="hidden" name="payment_date" value="<%= new Date().toISOString().split('T')[0] %>">
+
+          <!-- Terms and Conditions -->
+          <div class="mt-6 flex items-start">
+            <div class="flex items-center h-5">
+              <input id="terms" name="terms" type="checkbox"
+                    class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
+            </div>
+            <div class="ml-3 text-sm">
+              <label for="terms" class="font-medium text-gray-700">I agree to the</label>
+              <a href="/terms" class="text-blue-600 hover:underline"> terms and conditions</a>
+            </div>
+          </div>
+
+          <!-- Pay Now Button -->
+          <button type="submit" id="payNowBtn"
+          class="mt-6 w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium disabled:opacity-50 disabled:cursor-not-allowed relative group"
+          <%= !cartItems.length ? 'disabled' : '' %>>
+            Pay Now $<%= cartItems.reduce((sum, item) => sum + item.Device.price * item.quantity, 0).toFixed(2) %>
+            <% if (!cartItems.length) { %>
+              <span class="absolute invisible group-hover:visible w-48 bg-gray-800 text-white text-center rounded py-1 px-3 bottom-full left-1/2 transform -translate-x-1/2 mb-2">
+                Your cart is empty. Add items to proceed.
+              </span>
+            <% } %>
+          </button>
+        </form>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Client-side validation removed for assignment compliance -->
 </main>
 <%- include('partials/footer') %>
 </body>

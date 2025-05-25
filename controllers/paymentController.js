@@ -122,7 +122,7 @@ const validatePaymentDate = (paymentDate) => {
 };
 
 const validatePaymentMethod = (paymentMethod) => {
-  const validMethods = ["credit_card", "debit_card", "paypal", "bank_transfer"];
+  const validMethods = ["Credit Card", "PayPal", "Bank Transfer"];
   return validMethods.includes(paymentMethod);
 };
 

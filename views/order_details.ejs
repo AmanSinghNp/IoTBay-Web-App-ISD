@@ -68,29 +68,54 @@
         </div>
       </div>
 
-      <% if (order.Payment) { %>
+      <% if (order.payment) { %>
       <div class="mt-4 p-4 bg-blue-50 rounded">
         <h3 class="font-semibold mb-2">Payment Info</h3>
         <ul class="space-y-1 text-sm">
           <li class="flex justify-between">
             <span class="text-gray-600">Method:</span>
-            <span><%= order.Payment.paymentMethod %></span>
-          </li>
-          <li class="flex justify-between">
-            <span class="text-gray-600">Status:</span>
-            <span><%= order.Payment.status %></span>
+            <span><%= order.payment.payment_method %></span>
           </li>
           <li class="flex justify-between">
             <span class="text-gray-600">Amount:</span>
-            <span>$<%= order.Payment.amount.toFixed(2) %></span>
+            <span>$<%= parseFloat(order.payment.amount).toFixed(2) %></span>
           </li>
           <li class="flex justify-between">
-            <span class="text-gray-600">Transaction ID:</span>
-            <span class="font-mono text-xs"
-              ><%= order.Payment.transactionId %></span
+            <span class="text-gray-600">Payment Date:</span>
+            <span
+              ><%= new Date(order.payment.payment_date).toLocaleDateString()
+              %></span
+            >
+          </li>
+          <li class="flex justify-between">
+            <span class="text-gray-600">Card (Last 4):</span>
+            <span
+              ><%= order.payment.card_number ? '**** ' +
+              order.payment.card_number.slice(-4) : 'N/A' %></span
             >
           </li>
         </ul>
+        <div class="mt-2">
+          <a
+            href="/orders/<%= order.id %>/payment/details"
+            class="text-blue-600 hover:underline text-sm"
+          >
+            View Full Payment Details
+          </a>
+        </div>
+      </div>
+      <% } else { %>
+      <div class="mt-4 p-4 bg-yellow-50 rounded">
+        <h3 class="font-semibold mb-2">Payment Info</h3>
+        <p class="text-sm text-gray-600">
+          No payment information found for this order.
+        </p>
+        <a
+          href="/orders/<%= order.id %>/payment"
+          class="text-blue-600 hover:underline text-sm"
+        >
+          Add Payment Details
+        </a>
       </div>
       <% } %> <% if (order.Shipment) { %>
       <div class="mt-4 p-4 bg-green-50 rounded">

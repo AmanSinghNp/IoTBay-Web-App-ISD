@@ -42,7 +42,7 @@ const Payment = sequelize.define(
       allowNull: false,
       field: "order_id",
       references: {
-        model: "Orders",
+        model: "Order",
         key: "id",
       },
     },

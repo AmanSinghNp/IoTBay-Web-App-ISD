@@ -79,6 +79,60 @@ const validateAddressId = (addressId) => {
   return { valid: true };
 };
 
+/**
+ * Helper function to fetch addresses and orders for form re-rendering
+ * @param {number} userId - The user ID
+ * @param {boolean} filterAvailableOrders - Whether to filter orders without shipments
+ * @returns {Promise<object>} - Object containing addresses and orders
+ */
+const getFormData = async (userId, filterAvailableOrders = false) => {
+  const addresses = await Address.findAll({
+    where: { userId: userId },
+  });
+
+  const userOrders = await Order.findAll({
+    where: {
+      userId: userId,
+      status: "Placed",
+    },
+    include: [
+      {
+        model: OrderItem,
+        include: [Device],
+      },
+    ],
+  });
+
+  let orders = userOrders;
+
+  if (filterAvailableOrders) {
+    // Filter orders that don't already have shipments
+    const availableOrders = [];
+    for (const order of userOrders) {
+      const existingShipment = await Shipment.findOne({
+        where: { orderId: order.id },
+      });
+      if (!existingShipment) {
+        availableOrders.push(order);
+      }
+    }
+    orders = availableOrders;
+  }
+
+  return { addresses, orders };
+};
+
+/**
+ * Helper function to fetch addresses for edit form re-rendering
+ * @param {number} userId - The user ID
+ * @returns {Promise<Array>} - Array of addresses
+ */
+const getUserAddresses = async (userId) => {
+  return await Address.findAll({
+    where: { userId: userId },
+  });
+};
+
 // View all customer's shipments with search functionality
 exports.viewShipments = async (req, res) => {
   if (!req.session.userId) {
@@ -249,37 +303,11 @@ exports.createShipment = async (req, res) => {
     }
 
     if (errors.length > 0) {
-      // Get data needed for re-rendering the form
-      const addresses = await Address.findAll({
-        where: { userId: userId },
-      });
-
-      const userOrders = await Order.findAll({
-        where: {
-          userId: userId,
-          status: "Placed",
-        },
-        include: [
-          {
-            model: OrderItem,
-            include: [Device],
-          },
-        ],
-      });
-
-      const availableOrders = [];
-      for (const order of userOrders) {
-        const existingShipment = await Shipment.findOne({
-          where: { orderId: order.id },
-        });
-        if (!existingShipment) {
-          availableOrders.push(order);
-        }
-      }
+      const { addresses, orders } = await getFormData(userId, true);
 
       return res.render("shipments/create", {
         addresses,
-        orders: availableOrders,
+        orders,
         errors: errors,
         formData: { orderId, method, shipmentDate, addressId },
       });
@@ -295,26 +323,11 @@ exports.createShipment = async (req, res) => {
     });
 
     if (!order) {
-      const addresses = await Address.findAll({
-        where: { userId: userId },
-      });
-
-      const userOrders = await Order.findAll({
-        where: {
-          userId: userId,
-          status: "Placed",
-        },
-        include: [
-          {
-            model: OrderItem,
-            include: [Device],
-          },
-        ],
-      });
+      const { addresses, orders } = await getFormData(userId);
 
       return res.render("shipments/create", {
         addresses,
-        orders: userOrders,
+        orders,
         errors: ["Invalid order or unauthorized access."],
         formData: { orderId, method, shipmentDate, addressId },
       });
@@ -325,26 +338,11 @@ exports.createShipment = async (req, res) => {
       where: { orderId: parseInt(orderId) },
     });
     if (existingShipment) {
-      const addresses = await Address.findAll({
-        where: { userId: userId },
-      });
-
-      const userOrders = await Order.findAll({
-        where: {
-          userId: userId,
-          status: "Placed",
-        },
-        include: [
-          {
-            model: OrderItem,
-            include: [Device],
-          },
-        ],
-      });
+      const { addresses, orders } = await getFormData(userId);
 
       return res.render("shipments/create", {
         addresses,
-        orders: userOrders,
+        orders,
         errors: ["Shipment already exists for this order."],
         formData: { orderId, method, shipmentDate, addressId },
       });
@@ -359,26 +357,11 @@ exports.createShipment = async (req, res) => {
     });
 
     if (!address) {
-      const addresses = await Address.findAll({
-        where: { userId: userId },
-      });
-
-      const userOrders = await Order.findAll({
-        where: {
-          userId: userId,
-          status: "Placed",
-        },
-        include: [
-          {
-            model: OrderItem,
-            include: [Device],
-          },
-        ],
-      });
+      const { addresses, orders } = await getFormData(userId);
 
       return res.render("shipments/create", {
         addresses,
-        orders: userOrders,
+        orders,
         errors: ["Invalid address selected."],
         formData: { orderId, method, shipmentDate, addressId },
       });
@@ -477,9 +460,7 @@ exports.getEditShipment = async (req, res) => {
     }
 
     // Get user's addresses
-    const addresses = await Address.findAll({
-      where: { userId: userId },
-    });
+    const addresses = await getUserAddresses(userId);
 
     res.render("shipments/edit", { shipment, addresses });
   } catch (error) {
@@ -544,10 +525,7 @@ exports.updateShipment = async (req, res) => {
     }
 
     if (errors.length > 0) {
-      // Get user's addresses for re-rendering the form
-      const addresses = await Address.findAll({
-        where: { userId: userId },
-      });
+      const addresses = await getUserAddresses(userId);
 
       return res.render("shipments/edit", {
         shipment: { ...shipment.dataValues, method, shipmentDate, addressId },
@@ -565,9 +543,7 @@ exports.updateShipment = async (req, res) => {
     });
 
     if (!address) {
-      const addresses = await Address.findAll({
-        where: { userId: userId },
-      });
+      const addresses = await getUserAddresses(userId);
 
       return res.render("shipments/edit", {
         shipment: { ...shipment.dataValues, method, shipmentDate, addressId },

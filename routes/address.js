@@ -1,57 +1,23 @@
 const express = require("express");
 const router = express.Router();
-const Address = require("../models/address");
+const addressController = require("../controllers/addressController");
 
-// ADD Address
-router.post("/address/add", async (req, res) => {
-  const { userId, label, street, city, postcode, country } = req.body;
+// GET all addresses (delivery page)
+router.get("/delivery", addressController.getUserAddresses);
 
-  try {
-    await Address.create({ userId, label, street, city, postcode, country });
-    res.redirect("/delivery");
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Failed to add address.");
-  }
-});
+// GET add address form
+router.get("/address/add", addressController.getAddAddressForm);
 
-// DELETE Address
-router.post("/address/delete/:id", async (req, res) => {
-  try {
-    await Address.destroy({ where: { id: req.params.id } });
-    res.redirect("/delivery");
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Failed to delete address.");
-  }
-});
+// POST add new address
+router.post("/address/add", addressController.createAddress);
 
-// EDIT FORM
-router.get("/address/edit/:id", async (req, res) => {
-  try {
-    const address = await Address.findByPk(req.params.id);
-    if (!address) return res.status(404).send("Address not found.");
-    res.render("address_edit", { address });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Failed to load address.");
-  }
-});
+// GET edit address form
+router.get("/address/edit/:id", addressController.getEditAddressForm);
 
-// SUBMIT EDIT
-router.post("/address/edit/:id", async (req, res) => {
-  const { label, street, city, postcode, country } = req.body;
+// POST update address
+router.post("/address/edit/:id", addressController.updateAddress);
 
-  try {
-    const address = await Address.findByPk(req.params.id);
-    if (!address) return res.status(404).send("Address not found.");
-
-    await address.update({ label, street, city, postcode, country });
-    res.redirect("/delivery");
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Failed to update address.");
-  }
-});
+// POST delete address
+router.post("/address/delete/:id", addressController.deleteAddress);
 
 module.exports = router;

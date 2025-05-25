@@ -10,19 +10,19 @@
     <!-- Shipping Method -->
     <div>
       <label class="block text-sm font-medium">Shipping Method</label>
-      <input type="text" name="method" value="<%= shipment.method %>" required class="w-full border px-3 py-2 rounded" />
+      <input type="text" name="method" value="<%= shipment.method %>" class="w-full border px-3 py-2 rounded" />
     </div>
 
     <!-- Shipment Date -->
     <div>
       <label class="block text-sm font-medium">Shipment Date</label>
-      <input type="date" name="shipmentDate" value="<%= shipment.shipmentDate %>" required class="w-full border px-3 py-2 rounded" />
+      <input type="date" name="shipmentDate" value="<%= shipment.shipmentDate %>" class="w-full border px-3 py-2 rounded" />
     </div>
 
     <!-- Address Dropdown -->
     <div>
       <label class="block text-sm font-medium">Select Address</label>
-      <select name="addressId" required class="w-full border px-3 py-2 rounded">
+      <select name="addressId" class="w-full border px-3 py-2 rounded">
         <% addresses.forEach(addr => { %>
           <option value="<%= addr.id %>" <%= addr.id === shipment.addressId ? "selected" : "" %>>
             <%= addr.label %> — <%= addr.street %>, <%= addr.city %>

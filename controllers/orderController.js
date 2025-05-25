@@ -5,6 +5,80 @@ const Payment = require("../models/payment");
 const Shipment = require("../models/shipment");
 const OrderItem = require("../models/orderItem");
 const { Op } = require("sequelize");
+const {
+  logOrderCreated,
+  logOrderCancelled,
+  logOrderUpdated,
+} = require("../middleware/orderLogger");
+
+// Validation helper functions
+const validateDeviceId = (deviceId) => {
+  if (!deviceId) return { valid: false, message: "Device ID is required." };
+
+  const numDeviceId = parseInt(deviceId);
+  if (isNaN(numDeviceId) || numDeviceId <= 0) {
+    return { valid: false, message: "Invalid device ID." };
+  }
+
+  return { valid: true };
+};
+
+const validateQuantity = (quantity) => {
+  if (!quantity && quantity !== 0)
+    return { valid: false, message: "Quantity is required." };
+
+  const numQuantity = parseInt(quantity);
+  if (isNaN(numQuantity))
+    return { valid: false, message: "Quantity must be a valid number." };
+  if (numQuantity <= 0)
+    return { valid: false, message: "Quantity must be greater than zero." };
+  if (numQuantity > 999)
+    return { valid: false, message: "Quantity cannot exceed 999 items." };
+  if (!Number.isInteger(parseFloat(quantity)))
+    return { valid: false, message: "Quantity must be a whole number." };
+
+  return { valid: true };
+};
+
+const validateEmail = (email) => {
+  if (!email)
+    return { valid: false, message: "Email is required for anonymous orders." };
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email))
+    return { valid: false, message: "Please enter a valid email address." };
+  if (email.length > 255)
+    return { valid: false, message: "Email address is too long." };
+  return { valid: true };
+};
+
+const validateOrderItems = (orderItems) => {
+  if (!orderItems || !Array.isArray(orderItems)) {
+    return { valid: false, message: "Order items are required." };
+  }
+
+  if (orderItems.length === 0) {
+    return { valid: false, message: "At least one order item is required." };
+  }
+
+  for (const item of orderItems) {
+    if (!item.id || !item.quantity) {
+      return {
+        valid: false,
+        message: "Each order item must have an ID and quantity.",
+      };
+    }
+
+    const quantityValidation = validateQuantity(item.quantity);
+    if (!quantityValidation.valid) {
+      return {
+        valid: false,
+        message: `Item ${item.id}: ${quantityValidation.message}`,
+      };
+    }
+  }
+
+  return { valid: true };
+};
 
 // View list of customer's orders
 exports.viewOrders = async (req, res) => {
@@ -63,13 +137,35 @@ exports.viewOrders = async (req, res) => {
 // Place a new order
 exports.createOrder = async (req, res) => {
   try {
-    const { deviceId, quantity } = req.body;
+    const { deviceId, quantity, email } = req.body;
     let userId = req.session.userId;
+
+    // Comprehensive server-side validation
+    const errors = [];
+
+    // Device ID validation
+    const deviceIdValidation = validateDeviceId(deviceId);
+    if (!deviceIdValidation.valid) {
+      errors.push(deviceIdValidation.message);
+    }
+
+    // Quantity validation
+    const quantityValidation = validateQuantity(quantity);
+    if (!quantityValidation.valid) {
+      errors.push(quantityValidation.message);
+    }
 
     // Handle anonymous users
     let isAnonymous = false;
     if (!userId) {
       isAnonymous = true;
+
+      // Email validation for anonymous users
+      const emailValidation = validateEmail(email);
+      if (!emailValidation.valid) {
+        errors.push(emailValidation.message);
+      }
+
       if (!req.session.anonymousId) {
         req.session.anonymousId = `anon_${Date.now()}_${Math.random()
           .toString(36)
@@ -78,12 +174,28 @@ exports.createOrder = async (req, res) => {
       userId = null;
     }
 
-    const device = await Device.findByPk(deviceId);
+    if (errors.length > 0) {
+      return res.status(400).json({
+        success: false,
+        errors: errors,
+      });
+    }
 
-    if (!device || device.stock < quantity) {
-      return res
-        .status(400)
-        .send("Device not available or insufficient stock.");
+    // Verify device exists and has sufficient stock
+    const device = await Device.findByPk(parseInt(deviceId));
+
+    if (!device) {
+      return res.status(400).json({
+        success: false,
+        errors: ["Device not found."],
+      });
+    }
+
+    if (device.stock < parseInt(quantity)) {
+      return res.status(400).json({
+        success: false,
+        errors: [`Insufficient stock. Only ${device.stock} items available.`],
+      });
     }
 
     // Create order
@@ -91,20 +203,36 @@ exports.createOrder = async (req, res) => {
       userId,
       status: "Placed",
       anonymousId: isAnonymous ? req.session.anonymousId : null,
-      anonymousEmail: isAnonymous && req.body.email ? req.body.email : null,
+      anonymousEmail: isAnonymous ? email.trim().toLowerCase() : null,
     });
 
     // Create order item
     await OrderItem.create({
       orderId: order.id,
       deviceId: device.id,
-      quantity,
+      quantity: parseInt(quantity),
       price: device.price,
     });
 
     // Decrease device stock
-    device.stock -= quantity;
+    device.stock -= parseInt(quantity);
     await device.save();
+
+    // Log order creation
+    await logOrderCreated(
+      order.id,
+      userId,
+      {
+        deviceId: device.id,
+        deviceName: device.name,
+        quantity: parseInt(quantity),
+        price: device.price,
+        totalAmount: device.price * parseInt(quantity),
+        isAnonymous: isAnonymous,
+        anonymousEmail: isAnonymous ? email.trim().toLowerCase() : null,
+      },
+      req
+    );
 
     // Store anonymous orders in session for retrieval
     if (isAnonymous) {
@@ -119,8 +247,11 @@ exports.createOrder = async (req, res) => {
 
     res.redirect("/orders");
   } catch (error) {
-    console.error(error);
-    res.status(500).send("Failed to place order.");
+    console.error("Error creating order:", error);
+    return res.status(500).json({
+      success: false,
+      errors: ["Failed to place order. Please try again."],
+    });
   }
 };
 
@@ -166,6 +297,14 @@ exports.cancelOrder = async (req, res) => {
           await device.save();
         }
       }
+
+      // Log order cancellation
+      await logOrderCancelled(
+        order.id,
+        req.session.userId,
+        "User cancelled order",
+        req
+      );
     } else {
       return res
         .status(400)
@@ -191,6 +330,22 @@ exports.updateOrder = async (req, res) => {
   const { orderItems } = req.body;
 
   try {
+    // Comprehensive server-side validation
+    const errors = [];
+
+    // Order items validation
+    const orderItemsValidation = validateOrderItems(orderItems);
+    if (!orderItemsValidation.valid) {
+      errors.push(orderItemsValidation.message);
+    }
+
+    if (errors.length > 0) {
+      return res.status(400).json({
+        success: false,
+        errors: errors,
+      });
+    }
+
     const order = await Order.findByPk(orderId, {
       include: [
         {
@@ -201,12 +356,18 @@ exports.updateOrder = async (req, res) => {
     });
 
     if (!order) {
-      return res.status(404).send("Order not found.");
+      return res.status(404).json({
+        success: false,
+        errors: ["Order not found."],
+      });
     }
 
     // Check authorization for registered users
     if (req.session.userId && order.userId !== req.session.userId) {
-      return res.status(403).send("Unauthorized.");
+      return res.status(403).json({
+        success: false,
+        errors: ["Unauthorized access."],
+      });
     }
 
     // Check authorization for anonymous users
@@ -217,51 +378,85 @@ exports.updateOrder = async (req, res) => {
         !req.session.anonymousOrders ||
         !req.session.anonymousOrders.includes(parseInt(orderId)))
     ) {
-      return res.status(403).send("Unauthorized.");
+      return res.status(403).json({
+        success: false,
+        errors: ["Unauthorized access."],
+      });
     }
 
     if (order.status !== "Placed") {
-      return res.status(400).send("Cannot update a finalized order.");
+      return res.status(400).json({
+        success: false,
+        errors: ["Cannot update a finalized order."],
+      });
     }
 
     // Process each order item update
-    if (orderItems && Array.isArray(orderItems)) {
-      for (const item of orderItems) {
-        const { id, quantity } = item;
-        if (!id || !quantity) continue;
+    const updateErrors = [];
 
-        const orderItem = order.OrderItems.find((i) => i.id === parseInt(id));
-        if (!orderItem) continue;
+    for (const item of orderItems) {
+      const { id, quantity } = item;
+      const newQuantity = parseInt(quantity);
 
-        // Calculate stock adjustment
-        const stockChange = orderItem.quantity - quantity;
-
-        // Update device stock
-        const device = orderItem.Device;
-        if (stockChange > 0 || device.stock >= Math.abs(stockChange)) {
-          device.stock += stockChange;
-          await device.save();
-
-          // Update order item quantity
-          orderItem.quantity = quantity;
-          await orderItem.save();
-        } else {
-          return res
-            .status(400)
-            .send(`Not enough stock available for ${device.name}`);
-        }
+      const orderItem = order.OrderItems.find((i) => i.id === parseInt(id));
+      if (!orderItem) {
+        updateErrors.push(`Order item ${id} not found.`);
+        continue;
       }
+
+      // Calculate stock adjustment
+      const stockChange = orderItem.quantity - newQuantity;
+      const device = orderItem.Device;
+
+      // Check if we have enough stock for the new quantity
+      if (stockChange < 0 && device.stock < Math.abs(stockChange)) {
+        updateErrors.push(
+          `Insufficient stock for ${device.name}. Only ${
+            device.stock + orderItem.quantity
+          } items available.`
+        );
+        continue;
+      }
+
+      // Update device stock
+      device.stock += stockChange;
+      await device.save();
+
+      // Update order item quantity
+      orderItem.quantity = newQuantity;
+      await orderItem.save();
     }
+
+    if (updateErrors.length > 0) {
+      return res.status(400).json({
+        success: false,
+        errors: updateErrors,
+      });
+    }
+
+    // Log order update
+    await logOrderUpdated(
+      order.id,
+      req.session.userId,
+      {
+        updatedItems: orderItems.length,
+        changes: "Order items quantities updated",
+      },
+      req
+    );
 
     // Redirect based on user type
     if (req.session.userId) {
-      res.redirect(`/orders/view/${order.id}`);
+      res.redirect("/orders");
     } else {
       res.redirect(`/orders/view/${order.id}?anonymousId=${anonymousId}`);
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).send("Failed to update order.");
+    console.error("Error updating order:", error);
+    return res.status(500).json({
+      success: false,
+      errors: ["Failed to update order. Please try again."],
+    });
   }
 };
 
@@ -277,7 +472,6 @@ exports.viewOrderDetails = async (req, res) => {
           model: OrderItem,
           include: [Device],
         },
-        Payment,
         Shipment,
       ],
     });
@@ -302,7 +496,17 @@ exports.viewOrderDetails = async (req, res) => {
       return res.status(403).send("Unauthorized.");
     }
 
-    res.render("order_details", { order, anonymousId });
+    // Load payment information using SQLite Payment model
+    Payment.findByOrderId(orderId, (err, payment) => {
+      if (err) {
+        console.error("Error loading payment:", err);
+      }
+
+      // Attach payment to order object for template
+      order.payment = payment;
+
+      res.render("order_details", { order, anonymousId });
+    });
   } catch (err) {
     console.error(err);
     res.status(500).send("Failed to load order details.");

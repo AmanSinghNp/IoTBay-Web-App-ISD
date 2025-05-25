@@ -1,43 +1,68 @@
 <%- include('partials/header') %>
 
-<div class="min-h-screen flex items-center justify-center bg-gray-100 px-4 py-10">
+<div
+  class="min-h-screen flex items-center justify-center bg-gray-100 px-4 py-10"
+>
   <div class="bg-white p-8 rounded shadow max-w-md w-full">
     <h2 class="text-2xl font-bold text-center mb-6">Create Shipment</h2>
 
     <form action="/shipment/create" method="POST" class="space-y-4">
       <div>
-        <label for="orderId" class="block text-sm font-medium text-gray-700">Order ID</label>
-        <input type="number" name="orderId" required
-               class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <label for="orderId" class="block text-sm font-medium text-gray-700"
+          >Order ID</label
+        >
+        <input
+          type="number"
+          name="orderId"
+          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
       </div>
 
       <div>
-        <label for="method" class="block text-sm font-medium text-gray-700">Shipping Method</label>
-        <input type="text" name="method" required
-               class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <label for="method" class="block text-sm font-medium text-gray-700"
+          >Shipping Method</label
+        >
+        <input
+          type="text"
+          name="method"
+          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
       </div>
 
       <div>
-        <label for="addressId" class="block text-sm font-medium text-gray-700">Select Address</label>
-        <select name="addressId" required
-                class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <label for="addressId" class="block text-sm font-medium text-gray-700"
+          >Select Address</label
+        >
+        <select
+          name="addressId"
+          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
           <% addresses.forEach(addr => { %>
-            <option value="<%= addr.id %>">
-              <%= addr.label %> – <%= addr.street %>, <%= addr.city %>
-            </option>
+          <option value="<%= addr.id %>">
+            <%= addr.label %> – <%= addr.street %>, <%= addr.city %>
+          </option>
           <% }) %>
         </select>
       </div>
 
       <div>
-        <label for="shipmentDate" class="block text-sm font-medium text-gray-700">Shipment Date</label>
-        <input type="date" name="shipmentDate" required
-               class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <label
+          for="shipmentDate"
+          class="block text-sm font-medium text-gray-700"
+          >Shipment Date</label
+        >
+        <input
+          type="date"
+          name="shipmentDate"
+          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
       </div>
 
       <div class="pt-4">
-        <button type="submit"
-                class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition duration-200">
+        <button
+          type="submit"
+          class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition duration-200"
+        >
           Create Shipment
         </button>
       </div>

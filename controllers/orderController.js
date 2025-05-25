@@ -5,6 +5,11 @@ const Payment = require("../models/payment");
 const Shipment = require("../models/shipment");
 const OrderItem = require("../models/orderItem");
 const { Op } = require("sequelize");
+const {
+  logOrderCreated,
+  logOrderCancelled,
+  logOrderUpdated,
+} = require("../middleware/orderLogger");
 
 // Validation helper functions
 const validateDeviceId = (deviceId) => {
@@ -213,6 +218,22 @@ exports.createOrder = async (req, res) => {
     device.stock -= parseInt(quantity);
     await device.save();
 
+    // Log order creation
+    await logOrderCreated(
+      order.id,
+      userId,
+      {
+        deviceId: device.id,
+        deviceName: device.name,
+        quantity: parseInt(quantity),
+        price: device.price,
+        totalAmount: device.price * parseInt(quantity),
+        isAnonymous: isAnonymous,
+        anonymousEmail: isAnonymous ? email.trim().toLowerCase() : null,
+      },
+      req
+    );
+
     // Store anonymous orders in session for retrieval
     if (isAnonymous) {
       if (!req.session.anonymousOrders) {
@@ -276,6 +297,14 @@ exports.cancelOrder = async (req, res) => {
           await device.save();
         }
       }
+
+      // Log order cancellation
+      await logOrderCancelled(
+        order.id,
+        req.session.userId,
+        "User cancelled order",
+        req
+      );
     } else {
       return res
         .status(400)
@@ -404,6 +433,17 @@ exports.updateOrder = async (req, res) => {
         errors: updateErrors,
       });
     }
+
+    // Log order update
+    await logOrderUpdated(
+      order.id,
+      req.session.userId,
+      {
+        updatedItems: orderItems.length,
+        changes: "Order items quantities updated",
+      },
+      req
+    );
 
     // Redirect based on user type
     if (req.session.userId) {

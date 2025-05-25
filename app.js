@@ -11,6 +11,7 @@ const Payment = require("./models/paymentSequelize"); // New Sequelize-based Pay
 const Cart = require("./models/cart");
 const Shipment = require("./models/shipment");
 const Address = require("./models/address");
+const OrderLog = require("./models/orderLog");
 
 // Define the relationships:
 User.hasMany(Cart, { foreignKey: "userId" });
@@ -48,6 +49,7 @@ const addressRoutes = require("./routes/address");
 const productRoutes = require("./routes/product");
 const cartRoutes = require("./routes/cart");
 const adminUserRoutes = require("./routes/adminUsers"); // Admin user management
+const orderLogRoutes = require("./routes/orderLogs"); // Order logging
 
 const app = express();
 const PORT = 3000;
@@ -103,6 +105,7 @@ app.use("/", deliveryRoutes);
 app.use("/", shipmentRoutes);
 app.use("/", addressRoutes);
 app.use("/admin/users", adminUserRoutes); // Admin user management
+app.use("/", orderLogRoutes); // Order logging
 
 // Home route
 app.get("/", (req, res) => {
@@ -117,20 +120,24 @@ app.get("/dashboard", (req, res) => {
   res.render("dashboard", { userName: req.session.userName });
 });
 
-// DB sync + server start
-sequelize
-  .sync()
-  .then(() => {
-    console.log("✅ Database synced");
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running at http://localhost:${PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.error("❌ Failed to sync DB:", err);
-  });
-
 // 404 Page Handler
 app.use((req, res, next) => {
   res.status(404).render("404");
 });
+
+// DB sync + server start (only if not in test mode)
+if (process.env.NODE_ENV !== "test") {
+  sequelize
+    .sync()
+    .then(() => {
+      console.log("✅ Database synced");
+      app.listen(PORT, () => {
+        console.log(`🚀 Server running at http://localhost:${PORT}`);
+      });
+    })
+    .catch((err) => {
+      console.error("❌ Failed to sync DB:", err);
+    });
+}
+
+module.exports = app;

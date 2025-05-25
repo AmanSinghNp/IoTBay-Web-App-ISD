@@ -3,6 +3,12 @@ const Device = require("../models/device");
 const Order = require("../models/order");
 const OrderItem = require("../models/orderItem");
 const Payment = require("../models/payment");
+const {
+  logOrderCreated,
+  logPaymentAdded,
+  logPaymentConfirmed,
+} = require("../middleware/orderLogger");
+const { completePaymentWorkflow } = require("../middleware/shipmentService");
 
 // Validation helper functions
 const validateCardNumber = (cardNumber) => {
@@ -217,14 +223,33 @@ exports.processCheckout = async (req, res) => {
     const order = await Order.create({ userId });
 
     // Create order items for each cart item
+    const orderItems = [];
     for (const item of cartItems) {
-      await OrderItem.create({
+      const orderItem = await OrderItem.create({
         orderId: order.id,
         deviceId: item.deviceId,
         quantity: item.quantity,
         price: item.Device.price,
       });
+      orderItems.push({
+        deviceId: item.deviceId,
+        deviceName: item.Device.name,
+        quantity: item.quantity,
+        price: item.Device.price,
+      });
     }
+
+    // Log order creation
+    await logOrderCreated(
+      order.id,
+      userId,
+      {
+        totalItems: cartItems.length,
+        totalAmount: calculatedTotal,
+        items: orderItems,
+      },
+      req
+    );
 
     // Create payment record
     const paymentData = {
@@ -242,7 +267,7 @@ exports.processCheckout = async (req, res) => {
       user_id: userId,
     };
 
-    Payment.create(paymentData, (err, paymentResult) => {
+    Payment.create(paymentData, async (err, paymentResult) => {
       if (err) {
         console.error("Payment creation error:", err);
         req.flash("error", "Payment processing failed. Please try again.");
@@ -253,13 +278,59 @@ exports.processCheckout = async (req, res) => {
         });
       }
 
+      // Log payment addition
+      await logPaymentAdded(
+        order.id,
+        userId,
+        {
+          paymentId: paymentResult.id,
+          paymentMethod: payment_method,
+          amount: parseFloat(amount),
+          cardLastFour:
+            payment_method === "Credit Card" ? card_number.slice(-4) : null,
+        },
+        req
+      );
+
+      // Log payment confirmation
+      await logPaymentConfirmed(
+        order.id,
+        userId,
+        {
+          paymentId: paymentResult.id,
+          paymentMethod: payment_method,
+          amount: parseFloat(amount),
+          transactionStatus: "confirmed",
+        },
+        req
+      );
+
+      // Complete the payment workflow (auto-create shipment and confirm order)
+      const workflowResult = await completePaymentWorkflow(
+        order.id,
+        userId,
+        {
+          paymentId: paymentResult.id,
+          paymentMethod: payment_method,
+          amount: parseFloat(amount),
+        },
+        req
+      );
+
       // Clear the cart after successful payment
       Cart.destroy({ where: { userId } })
         .then(() => {
-          req.flash(
-            "success",
-            "Payment processed successfully! Your order has been placed."
-          );
+          if (workflowResult.success && workflowResult.shipment) {
+            req.flash(
+              "success",
+              "Payment processed successfully! Your order has been confirmed and shipment has been automatically created."
+            );
+          } else {
+            req.flash(
+              "success",
+              "Payment processed successfully! Your order has been placed."
+            );
+          }
           // Redirect to order details page with payment information
           res.redirect(`/orders/view/${order.id}`);
         })

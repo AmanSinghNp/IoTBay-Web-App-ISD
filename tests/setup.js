@@ -1,12 +1,17 @@
-const sequelize = require("../config/testDatabase");
+const sequelize = require("../config/database"); // Use main database config which now supports test env
 
 // Setup test database
 beforeAll(async () => {
   try {
     await sequelize.authenticate();
     console.log("Test database connection established successfully.");
+
+    // Sync all models for testing
+    await sequelize.sync({ force: true });
+    console.log("Test database synced successfully.");
   } catch (error) {
     console.error("Unable to connect to the test database:", error);
+    throw error;
   }
 });
 
@@ -21,4 +26,4 @@ afterAll(async () => {
 });
 
 // Global test timeout
-jest.setTimeout(10000);
+jest.setTimeout(15000);

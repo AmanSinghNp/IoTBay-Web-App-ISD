@@ -1,244 +1,129 @@
-# IoTBay Web Application - Defect Log
+# Defect Log - IoTBay Web Application
 
-## Project Information
+## Defect Log Overview
 
-- **Project**: IoTBay Web Application - ISD Assignment 2
-- **Testing Period**: January 2024 - May 2024
-- **Tester**: Development Team
-- **Version**: 1.0.0
+This document contains the comprehensive defect log for the IoTBay web application, documenting all failed test cases identified during testing. The log includes defects from User Management System and Order Management System features.
+
+**Report Date**: January 25, 2025  
+**Testing Period**: January 20-25, 2025  
+**Application Version**: 1.0.0  
+**Environment**: Test Environment (SQLite Database)
 
 ---
 
 ## Defect Summary
 
-| **Metric**          | **Count** | **Percentage** |
-| ------------------- | --------- | -------------- |
-| Total Defects       | 8         | 100%           |
-| Resolved Defects    | 6         | 75%            |
-| In Progress Defects | 1         | 12.5%          |
-| Unresolved Defects  | 1         | 12.5%          |
+| **Metric**        | **Count** | **Percentage** |
+| ----------------- | --------- | -------------- |
+| **Total Defects** | 11        | 100%           |
+| **Resolved**      | 1         | 9%             |
+| **In Progress**   | 3         | 27%            |
+| **Identified**    | 3         | 27%            |
+| **Unresolved**    | 4         | 36%            |
+
+### Defects by Severity
+
+- **Critical**: 3 defects (27%)
+- **High**: 6 defects (55%)
+- **Medium**: 2 defects (18%)
+- **Low**: 0 defects (0%)
+
+### Defects by Feature
+
+- **User Management**: 5 defects (50%)
+- **Order Management**: 5 defects (50%)
 
 ---
 
-## Defect Details
+## Detailed Defect Log
 
-### DI001 - Database Architecture Inconsistency
-
-| **Field**              | **Value**                                                                                                                                           |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Defect ID**          | DI001                                                                                                                                               |
-| **Defect Description** | Payment model uses direct SQLite queries while other models use Sequelize ORM, creating architectural inconsistency                                 |
-| **Defect Date**        | 2024-01-20                                                                                                                                          |
-| **Test Case ID**       | TC_PAYMENT_001                                                                                                                                      |
-| **Tester Name**        | Development Team                                                                                                                                    |
-| **Responsible**        | Backend Developer                                                                                                                                   |
-| **Status**             | Resolved                                                                                                                                            |
-| **Priority**           | High                                                                                                                                                |
-| **Severity**           | Major                                                                                                                                               |
-| **Comments**           | Created new Sequelize-based Payment model (paymentSequelize.js) to maintain consistency. Updated app.js to use new model with proper relationships. |
-
-### DI002 - Missing JUnit Test Framework
-
-| **Field**              | **Value**                                                                                                                                                       |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Defect ID**          | DI002                                                                                                                                                           |
-| **Defect Description** | Assignment requires JUnit tests but project only had custom Node.js test scripts                                                                                |
-| **Defect Date**        | 2024-01-22                                                                                                                                                      |
-| **Test Case ID**       | TC_TESTING_001                                                                                                                                                  |
-| **Tester Name**        | QA Team                                                                                                                                                         |
-| **Responsible**        | Test Engineer                                                                                                                                                   |
-| **Status**             | Resolved                                                                                                                                                        |
-| **Priority**           | High                                                                                                                                                            |
-| **Severity**           | Major                                                                                                                                                           |
-| **Comments**           | Implemented Jest testing framework with proper unit tests for User Access Management and Payment Management features. Added test configuration and setup files. |
-
-### DI003 - User Access Log Cascade Delete Issue
-
-| **Field**              | **Value**                                                                                                 |
-| ---------------------- | --------------------------------------------------------------------------------------------------------- |
-| **Defect ID**          | DI003                                                                                                     |
-| **Defect Description** | When user is deleted, access logs remain in database causing orphaned records                             |
-| **Defect Date**        | 2024-01-25                                                                                                |
-| **Test Case ID**       | TC_USER_DELETE_001                                                                                        |
-| **Tester Name**        | Backend Developer                                                                                         |
-| **Responsible**        | Database Administrator                                                                                    |
-| **Status**             | Resolved                                                                                                  |
-| **Priority**           | Medium                                                                                                    |
-| **Severity**           | Minor                                                                                                     |
-| **Comments**           | Added proper foreign key constraints and cascade delete in UserAccessLog model. Verified with unit tests. |
-
-### DI004 - Payment Validation Missing
-
-| **Field**              | **Value**                                                                                                                      |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| **Defect ID**          | DI004                                                                                                                          |
-| **Defect Description** | Payment amount can be negative, no validation for positive amounts                                                             |
-| **Defect Date**        | 2024-02-01                                                                                                                     |
-| **Test Case ID**       | TC_PAYMENT_VALIDATION_001                                                                                                      |
-| **Tester Name**        | Frontend Developer                                                                                                             |
-| **Responsible**        | Backend Developer                                                                                                              |
-| **Status**             | In Progress                                                                                                                    |
-| **Priority**           | Medium                                                                                                                         |
-| **Severity**           | Minor                                                                                                                          |
-| **Comments**           | Need to add custom validation in Payment model to ensure amount is positive. Currently documented in test but not implemented. |
-
-### DI005 - Session Timeout Not Configured
-
-| **Field**              | **Value**                                                                                     |
-| ---------------------- | --------------------------------------------------------------------------------------------- |
-| **Defect ID**          | DI005                                                                                         |
-| **Defect Description** | User sessions don't expire properly, potential security issue                                 |
-| **Defect Date**        | 2024-02-05                                                                                    |
-| **Test Case ID**       | TC_SESSION_001                                                                                |
-| **Tester Name**        | Security Tester                                                                               |
-| **Responsible**        | Backend Developer                                                                             |
-| **Status**             | Resolved                                                                                      |
-| **Priority**           | Medium                                                                                        |
-| **Severity**           | Minor                                                                                         |
-| **Comments**           | Added session timeout configuration in app.js (24 hours). Implemented proper session cleanup. |
-
-### DI006 - Device Stock Validation Error
-
-| **Field**              | **Value**                                                                                                                                               |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Defect ID**          | DI006                                                                                                                                                   |
-| **Defect Description** | Users can order devices with 0 stock, causing negative inventory                                                                                        |
-| **Defect Date**        | 2024-02-10                                                                                                                                              |
-| **Test Case ID**       | TC_ORDER_STOCK_001                                                                                                                                      |
-| **Tester Name**        | Business Analyst                                                                                                                                        |
-| **Responsible**        | Backend Developer                                                                                                                                       |
-| **Status**             | Resolved                                                                                                                                                |
-| **Priority**           | High                                                                                                                                                    |
-| **Severity**           | Major                                                                                                                                                   |
-| **Comments**           | Added stock validation in order controller. Prevents orders when stock is 0 or insufficient. Updated UI to disable order button for out-of-stock items. |
-
-### DI007 - Flash Message Persistence Issue
-
-| **Field**              | **Value**                                                                                                               |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| **Defect ID**          | DI007                                                                                                                   |
-| **Defect Description** | Flash messages sometimes persist across multiple page loads                                                             |
-| **Defect Date**        | 2024-02-15                                                                                                              |
-| **Test Case ID**       | TC_UI_FLASH_001                                                                                                         |
-| **Tester Name**        | Frontend Developer                                                                                                      |
-| **Responsible**        | Frontend Developer                                                                                                      |
-| **Status**             | Resolved                                                                                                                |
-| **Priority**           | Low                                                                                                                     |
-| **Severity**           | Minor                                                                                                                   |
-| **Comments**           | Fixed flash message middleware in app.js to properly clear messages after display. Added proper session flash handling. |
-
-### DI008 - Missing Error Handling in Payment Controller
-
-| **Field**              | **Value**                                                                                                                                |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| **Defect ID**          | DI008                                                                                                                                    |
-| **Defect Description** | Payment controller doesn't handle database connection errors gracefully                                                                  |
-| **Defect Date**        | 2024-02-20                                                                                                                               |
-| **Test Case ID**       | TC_ERROR_HANDLING_001                                                                                                                    |
-| **Tester Name**        | Backend Developer                                                                                                                        |
-| **Responsible**        | Backend Developer                                                                                                                        |
-| **Status**             | Unresolved                                                                                                                               |
-| **Priority**           | Medium                                                                                                                                   |
-| **Severity**           | Minor                                                                                                                                    |
-| **Comments**           | Need to add comprehensive try-catch blocks and proper error responses in payment controller. Currently only basic error handling exists. |
+| Defect ID | Defect Description                                                             | Problem & Action                                                                                                                                                                                                                             | Defect Date | Test Case ID  | Tester Name      | Responsible      | Status      | Severity | Comments                                                   |
+| --------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ------------- | ---------------- | ---------------- | ----------- | -------- | ---------------------------------------------------------- |
+| **DI001** | Admin panel returns 302 redirect instead of 200 OK when accessing /admin/users | **Problem**: Authentication middleware redirecting staff users instead of granting access to admin panel<br>**Action**: Fix authentication middleware to properly handle staff role permissions                                              | 2025-01-25  | IT-UM-02      | Test Suite       | Development Team | In Progress | Critical | Blocking admin functionality access                        |
+| **DI002** | User search functionality not filtering results correctly                      | **Problem**: Search query parameters not properly applied to database query, returning all users instead of filtered results<br>**Action**: Debug search controller logic and fix query building                                             | 2025-01-25  | IT-UM-03      | Test Suite       | Development Team | In Progress | High     | Search feature completely non-functional                   |
+| **DI003** | Password confirmation validation not working in registration                   | **Problem**: User registration allows mismatched passwords, creating security vulnerability<br>**Action**: Implement server-side password confirmation validation                                                                            | 2025-01-25  | UT-UM-01      | Test Suite       | Development Team | Identified  | High     | Security vulnerability in user registration                |
+| **DI004** | User role update not properly validated in admin interface                     | **Problem**: Role changes submitted through admin interface not persisting to database<br>**Action**: Debug user update controller and fix role assignment logic                                                                             | 2025-01-25  | IT-UM-04      | Test Suite       | Development Team | Identified  | High     | Admin cannot change user roles                             |
+| **DI005** | User deactivation not preventing system access                                 | **Problem**: isActive status not checked during authentication process, allowing deactivated users to login<br>**Action**: Add isActive check to authentication middleware                                                                   | 2025-01-25  | IT-UM-05      | Test Suite       | Development Team | Identified  | Critical | Security issue - deactivated users can still access system |
+| **DI006** | Checkout endpoint returns 404 instead of processing order                      | **Problem**: /checkout route not properly configured or missing from routing table<br>**Action**: Verify route configuration in app.js and implement missing checkout endpoint                                                               | 2025-01-25  | IT-OM-01      | Test Suite       | Development Team | Unresolved  | Critical | Core ordering functionality broken                         |
+| **DI007** | Order search by number includes unrelated orders                               | **Problem**: Order search filter not working correctly, displaying orders that don't match search criteria<br>**Action**: Fix order search query logic and test filtering                                                                    | 2025-01-25  | IT-OM-02      | Test Suite       | Development Team | Unresolved  | Medium   | Search functionality unreliable                            |
+| **DI008** | Order details page returns 404 for valid order IDs                             | **Problem**: Route pattern mismatch in order details endpoint, causing valid URLs to return 404<br>**Action**: Fix route pattern in orders.js and verify URL structure                                                                       | 2025-01-25  | IT-OM-03      | Test Suite       | Development Team | Unresolved  | High     | Users cannot view order details                            |
+| **DI009** | Order cancellation endpoint not found                                          | **Problem**: Cancel order route not implemented or incorrectly configured<br>**Action**: Implement order cancellation endpoint and add proper route mapping                                                                                  | 2025-01-25  | IT-OM-04      | Test Suite       | Development Team | Unresolved  | High     | Users cannot cancel orders                                 |
+| **DI010** | Stock validation not preventing over-ordering                                  | **Problem**: Stock check logic missing in order creation process, allowing orders for more items than available<br>**Action**: Implement stock validation in order controller before order creation                                          | 2025-01-25  | IT-OM-05      | Test Suite       | Development Team | In Progress | Medium   | Inventory management issue                                 |
+| **DI011** | Delivery route crashes with undefined userId error                             | **Problem**: Delivery route attempts to query Cart with undefined userId when user is not logged in, causing database query error<br>**Action**: Add authentication middleware to delivery route and handle unauthenticated users gracefully | 2025-01-25  | Runtime Error | Application Logs | Development Team | Resolved    | High     | Fixed by adding isLoggedIn middleware and error handling   |
 
 ---
 
-## Test Case References
+## Risk Assessment
 
-### TC_PAYMENT_001 - Payment Model Architecture Test
+### High Risk Defects (Immediate Action Required)
 
-- **Description**: Verify payment model follows same architecture as other models
-- **Expected Result**: Payment model uses Sequelize ORM with proper relationships
-- **Actual Result**: Payment model used direct SQLite queries
-- **Status**: Failed → Passed (after fix)
+- **DI001**: Blocks admin functionality
+- **DI005**: Security vulnerability
+- **DI006**: Core functionality broken
 
-### TC_TESTING_001 - Test Framework Compliance
+### Medium Risk Defects (Action Required Soon)
 
-- **Description**: Verify project uses JUnit-style testing as required by assignment
-- **Expected Result**: Jest or similar framework with proper unit tests
-- **Actual Result**: Only custom Node.js test scripts
-- **Status**: Failed → Passed (after implementation)
+- **DI002**: User experience impact
+- **DI003**: Security concern
+- **DI004**: Admin functionality limited
+- **DI008**: User experience impact
+- **DI009**: User experience impact
 
-### TC_USER_DELETE_001 - User Deletion Cascade Test
+### Low Risk Defects (Can Be Scheduled)
 
-- **Description**: Verify user deletion properly removes associated access logs
-- **Expected Result**: Access logs deleted when user is deleted
-- **Actual Result**: Orphaned access log records remained
-- **Status**: Failed → Passed (after fix)
-
-### TC_PAYMENT_VALIDATION_001 - Payment Amount Validation
-
-- **Description**: Verify payment amount must be positive
-- **Expected Result**: Negative amounts rejected with validation error
-- **Actual Result**: Negative amounts accepted
-- **Status**: Failed → In Progress
-
-### TC_SESSION_001 - Session Management Test
-
-- **Description**: Verify user sessions expire after configured timeout
-- **Expected Result**: Session expires after 24 hours
-- **Actual Result**: Sessions persisted indefinitely
-- **Status**: Failed → Passed (after fix)
-
-### TC_ORDER_STOCK_001 - Stock Validation Test
-
-- **Description**: Verify orders cannot be placed for out-of-stock items
-- **Expected Result**: Order rejected when stock is 0
-- **Actual Result**: Order accepted, causing negative stock
-- **Status**: Failed → Passed (after fix)
-
-### TC_UI_FLASH_001 - Flash Message Display Test
-
-- **Description**: Verify flash messages display once and then clear
-- **Expected Result**: Message shows once then disappears
-- **Actual Result**: Messages persisted across page loads
-- **Status**: Failed → Passed (after fix)
-
-### TC_ERROR_HANDLING_001 - Error Handling Test
-
-- **Description**: Verify graceful error handling in payment operations
-- **Expected Result**: Proper error responses and user feedback
-- **Actual Result**: Some errors not handled gracefully
-- **Status**: Failed → Open
-
----
-
-## Defect Trends
-
-### By Priority
-
-- **High**: 2 defects (25%)
-- **Medium**: 4 defects (50%)
-- **Low**: 2 defects (25%)
-
-### By Severity
-
-- **Major**: 3 defects (37.5%)
-- **Minor**: 5 defects (62.5%)
-
-### By Status
-
-- **Resolved**: 6 defects (75%)
-- **In Progress**: 1 defect (12.5%)
-- **Unresolved**: 1 defect (12.5%)
+- **DI007**: Minor functionality issue
+- **DI010**: Business logic issue
 
 ---
 
 ## Recommendations
 
-1. **Complete Payment Validation**: Implement positive amount validation in Payment model
-2. **Enhance Error Handling**: Add comprehensive error handling in all controllers
-3. **Automated Testing**: Expand test coverage to include integration tests
-4. **Code Review Process**: Implement peer review to catch architectural inconsistencies early
-5. **Documentation**: Maintain updated API documentation for all endpoints
+### Immediate Actions (Next 24 Hours)
+
+1. Fix authentication middleware (DI001, DI005)
+2. Implement checkout endpoint (DI006)
+3. Add password confirmation validation (DI003)
+
+### Short Term Actions (Next Week)
+
+1. Fix all route configuration issues (DI008, DI009)
+2. Implement proper search functionality (DI002, DI007)
+3. Fix user role update logic (DI004)
+4. Add stock validation (DI010)
+
+### Long Term Actions (Next Sprint)
+
+1. Implement comprehensive integration testing
+2. Add automated regression testing
+3. Improve error handling and logging
+4. Add monitoring and alerting for critical functions
+
+### Process Improvements
+
+1. **Code Review**: Implement mandatory code reviews for route changes
+2. **Testing Strategy**: Add integration tests to CI/CD pipeline
+3. **Documentation**: Improve API documentation for all endpoints
+4. **Monitoring**: Add application monitoring for critical user flows
 
 ---
 
-## Sign-off
+## Test Environment Information
 
-| **Role**              | **Name**         | **Date**   | **Signature**       |
-| --------------------- | ---------------- | ---------- | ------------------- |
-| **Test Lead**         | Development Team | 2024-05-25 | [Digital Signature] |
-| **Project Manager**   | Development Team | 2024-05-25 | [Digital Signature] |
-| **Quality Assurance** | Development Team | 2024-05-25 | [Digital Signature] |
+- **Database**: SQLite test database
+- **Node.js Version**: 18.x
+- **Test Framework**: Jest with Supertest
+- **Browser Testing**: Not implemented
+- **Load Testing**: Not performed
+- **Security Testing**: Basic validation only
+
+---
+
+## Defect Log Maintenance
+
+**Log Owner**: Development Team  
+**Review Frequency**: Daily during active development  
+**Update Schedule**: Real-time as defects are discovered/resolved  
+**Archive Policy**: Resolved defects archived after 30 days
+
+**Next Review Date**: January 26, 2025  
+**Escalation Contact**: Project Manager for critical defects

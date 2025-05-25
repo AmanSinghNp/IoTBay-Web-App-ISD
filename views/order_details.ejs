@@ -147,14 +147,7 @@
       </a>
 
       <div class="flex gap-2">
-        <% if (!locals.anonymousId) { %>
-        <a
-          href="/orders/<%= order.id %>/logs"
-          class="bg-gray-600 text-white text-sm px-4 py-2 rounded hover:bg-gray-700"
-        >
-          View Activity Log
-        </a>
-        <% } %> <% if (order.status === "Placed") { %>
+        <% if (order.status === "Placed") { %>
         <a
           href="/orders/edit/<%= order.id %><%= locals.anonymousId ? '?anonymousId=' + anonymousId : '' %>"
           class="bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-700"

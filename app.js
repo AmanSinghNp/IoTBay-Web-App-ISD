@@ -7,7 +7,7 @@ const sequelize = require("./config/database");
 const User = require("./models/user");
 const Device = require("./models/device");
 const Order = require("./models/order");
-// const Payment = require("./models/payment"); // SQLite-based model, not part of Sequelize relationships
+const Payment = require("./models/paymentSequelize"); // New Sequelize-based Payment model
 const Cart = require("./models/cart");
 const Shipment = require("./models/shipment");
 const Address = require("./models/address");
@@ -27,6 +27,13 @@ Address.belongsTo(User, { foreignKey: "userId" });
 
 Address.hasMany(Shipment, { foreignKey: "addressId" });
 Shipment.belongsTo(Address, { foreignKey: "addressId" });
+
+// Payment relationships
+User.hasMany(Payment, { foreignKey: "userId" });
+Payment.belongsTo(User, { foreignKey: "userId" });
+
+Order.hasMany(Payment, { foreignKey: "orderId" });
+Payment.belongsTo(Order, { foreignKey: "orderId" });
 
 // Import routes
 const authRoutes = require("./routes/auth");

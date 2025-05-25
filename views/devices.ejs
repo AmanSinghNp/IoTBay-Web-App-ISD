@@ -131,17 +131,6 @@
     <% } %>
   </div>
 </section>
-<script>
-  function toggleDetails(id, btn) {
-    const box = document.getElementById(id);
-    const isHidden = box.classList.contains("hidden");
-    box.classList.toggle("hidden");
-
-    // Change button text
-    if (btn) {
-      btn.textContent = isHidden ? "Hide Details" : "View Details";
-    }
-  }
-</script>
+<!-- Client-side functionality removed for assignment compliance -->
 
 <%- include('partials/footer') %>

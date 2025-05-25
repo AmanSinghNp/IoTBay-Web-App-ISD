@@ -60,9 +60,70 @@ exports.postCreateUser = async (req, res) => {
   try {
     const { fullName, email, password, phone, role, isActive } = req.body;
 
-    // Validation
-    if (!fullName || !email || !password) {
-      req.flash("error", "Full name, email, and password are required.");
+    // Enhanced server-side validation
+    if (!fullName || !fullName.trim()) {
+      req.flash("error", "Full name is required.");
+      return res.render("admin/users/create", {
+        errorMessage: req.flash("error"),
+        formData: req.body,
+      });
+    }
+
+    if (!email || !email.trim()) {
+      req.flash("error", "Email is required.");
+      return res.render("admin/users/create", {
+        errorMessage: req.flash("error"),
+        formData: req.body,
+      });
+    }
+
+    if (!password || !password.trim()) {
+      req.flash("error", "Password is required.");
+      return res.render("admin/users/create", {
+        errorMessage: req.flash("error"),
+        formData: req.body,
+      });
+    }
+
+    if (!role || !role.trim()) {
+      req.flash("error", "Role is required.");
+      return res.render("admin/users/create", {
+        errorMessage: req.flash("error"),
+        formData: req.body,
+      });
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      req.flash("error", "Please enter a valid email address.");
+      return res.render("admin/users/create", {
+        errorMessage: req.flash("error"),
+        formData: req.body,
+      });
+    }
+
+    // Password length validation
+    if (password.length < 6) {
+      req.flash("error", "Password must be at least 6 characters long.");
+      return res.render("admin/users/create", {
+        errorMessage: req.flash("error"),
+        formData: req.body,
+      });
+    }
+
+    // Full name length validation
+    if (fullName.trim().length < 2) {
+      req.flash("error", "Full name must be at least 2 characters long.");
+      return res.render("admin/users/create", {
+        errorMessage: req.flash("error"),
+        formData: req.body,
+      });
+    }
+
+    // Role validation
+    if (!["customer", "staff"].includes(role)) {
+      req.flash("error", "Invalid role selected.");
       return res.render("admin/users/create", {
         errorMessage: req.flash("error"),
         formData: req.body,
@@ -163,6 +224,47 @@ exports.postUpdateUser = async (req, res) => {
     if (!user) {
       req.flash("error", "User not found.");
       return res.redirect("/admin/users");
+    }
+
+    // Enhanced server-side validation
+    if (!fullName || !fullName.trim()) {
+      req.flash("error", "Full name is required.");
+      return res.redirect(`/admin/users/${userId}/edit`);
+    }
+
+    if (!email || !email.trim()) {
+      req.flash("error", "Email is required.");
+      return res.redirect(`/admin/users/${userId}/edit`);
+    }
+
+    if (!role || !role.trim()) {
+      req.flash("error", "Role is required.");
+      return res.redirect(`/admin/users/${userId}/edit`);
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      req.flash("error", "Please enter a valid email address.");
+      return res.redirect(`/admin/users/${userId}/edit`);
+    }
+
+    // Full name length validation
+    if (fullName.trim().length < 2) {
+      req.flash("error", "Full name must be at least 2 characters long.");
+      return res.redirect(`/admin/users/${userId}/edit`);
+    }
+
+    // Role validation
+    if (!["customer", "staff"].includes(role)) {
+      req.flash("error", "Invalid role selected.");
+      return res.redirect(`/admin/users/${userId}/edit`);
+    }
+
+    // Password validation if provided
+    if (password && password.trim() !== "" && password.length < 6) {
+      req.flash("error", "Password must be at least 6 characters long.");
+      return res.redirect(`/admin/users/${userId}/edit`);
     }
 
     // Check if email already exists (excluding current user)

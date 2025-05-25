@@ -19,6 +19,30 @@ exports.getLogin = (req, res) => {
 exports.postLogin = async (req, res) => {
   const { email, password } = req.body;
 
+  // Server-side validation
+  if (!email || !email.trim()) {
+    return res.render("login", {
+      error: "Email is required.",
+      successMessage: null,
+    });
+  }
+
+  if (!password || !password.trim()) {
+    return res.render("login", {
+      error: "Password is required.",
+      successMessage: null,
+    });
+  }
+
+  // Basic email format validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.render("login", {
+      error: "Please enter a valid email address.",
+      successMessage: null,
+    });
+  }
+
   try {
     const user = await User.findOne({ where: { email } });
 
@@ -69,6 +93,47 @@ exports.getRegister = (req, res) => {
 // Handle register form
 exports.postRegister = async (req, res) => {
   const { fullName, email, phone, password } = req.body;
+
+  // Server-side validation
+  if (!fullName || !fullName.trim()) {
+    return res.render("register", {
+      error: "Full name is required.",
+    });
+  }
+
+  if (!email || !email.trim()) {
+    return res.render("register", {
+      error: "Email is required.",
+    });
+  }
+
+  if (!password || !password.trim()) {
+    return res.render("register", {
+      error: "Password is required.",
+    });
+  }
+
+  // Email format validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.render("register", {
+      error: "Please enter a valid email address.",
+    });
+  }
+
+  // Password length validation
+  if (password.length < 6) {
+    return res.render("register", {
+      error: "Password must be at least 6 characters long.",
+    });
+  }
+
+  // Full name length validation
+  if (fullName.trim().length < 2) {
+    return res.render("register", {
+      error: "Full name must be at least 2 characters long.",
+    });
+  }
 
   try {
     const hash = await bcrypt.hash(password, 10);

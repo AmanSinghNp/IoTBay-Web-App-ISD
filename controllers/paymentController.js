@@ -1,5 +1,131 @@
 const Payment = require("../models/payment");
 
+// Validation helper functions
+const validateCardNumber = (cardNumber) => {
+  if (!cardNumber) return false;
+  // Remove spaces and dashes
+  const cleanCard = cardNumber.replace(/[\s\-]/g, "");
+  // Check if it's 13-19 digits (most card types)
+  if (!/^\d{13,19}$/.test(cleanCard)) return false;
+
+  // Luhn algorithm for card validation
+  let sum = 0;
+  let isEven = false;
+  for (let i = cleanCard.length - 1; i >= 0; i--) {
+    let digit = parseInt(cleanCard[i]);
+    if (isEven) {
+      digit *= 2;
+      if (digit > 9) digit -= 9;
+    }
+    sum += digit;
+    isEven = !isEven;
+  }
+  return sum % 10 === 0;
+};
+
+const validateExpiryDate = (expiryDate) => {
+  if (!expiryDate) return { valid: false, message: "Expiry date is required." };
+
+  // Accept MM/YY or MM/YYYY format
+  const expiryRegex = /^(0[1-9]|1[0-2])\/(\d{2}|\d{4})$/;
+  if (!expiryRegex.test(expiryDate)) {
+    return {
+      valid: false,
+      message: "Expiry date must be in MM/YY or MM/YYYY format.",
+    };
+  }
+
+  const [month, year] = expiryDate.split("/");
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1;
+
+  // Convert 2-digit year to 4-digit
+  const fullYear = year.length === 2 ? 2000 + parseInt(year) : parseInt(year);
+  const monthNum = parseInt(month);
+
+  // Check if the card has expired
+  if (
+    fullYear < currentYear ||
+    (fullYear === currentYear && monthNum < currentMonth)
+  ) {
+    return { valid: false, message: "Card has expired." };
+  }
+
+  // Check if expiry is too far in the future (more than 10 years)
+  if (fullYear > currentYear + 10) {
+    return { valid: false, message: "Invalid expiry date." };
+  }
+
+  return { valid: true };
+};
+
+const validateCVV = (cvv) => {
+  if (!cvv) return false;
+  // CVV should be 3 or 4 digits
+  return /^\d{3,4}$/.test(cvv);
+};
+
+const validateAmount = (amount) => {
+  if (!amount) return { valid: false, message: "Amount is required." };
+
+  const numAmount = parseFloat(amount);
+  if (isNaN(numAmount))
+    return { valid: false, message: "Amount must be a valid number." };
+  if (numAmount <= 0)
+    return { valid: false, message: "Amount must be greater than zero." };
+  if (numAmount > 999999.99)
+    return { valid: false, message: "Amount is too large." };
+
+  // Check for reasonable decimal places (max 2)
+  const decimalPlaces = (amount.toString().split(".")[1] || "").length;
+  if (decimalPlaces > 2)
+    return {
+      valid: false,
+      message: "Amount can have at most 2 decimal places.",
+    };
+
+  return { valid: true };
+};
+
+const validatePaymentDate = (paymentDate) => {
+  if (!paymentDate)
+    return { valid: false, message: "Payment date is required." };
+
+  const date = new Date(paymentDate);
+  if (isNaN(date.getTime()))
+    return { valid: false, message: "Invalid payment date." };
+
+  const currentDate = new Date();
+  const maxFutureDate = new Date();
+  maxFutureDate.setDate(currentDate.getDate() + 30); // Allow up to 30 days in future
+
+  if (date > maxFutureDate) {
+    return {
+      valid: false,
+      message: "Payment date cannot be more than 30 days in the future.",
+    };
+  }
+
+  // Don't allow dates too far in the past (more than 1 year)
+  const minPastDate = new Date();
+  minPastDate.setFullYear(currentDate.getFullYear() - 1);
+
+  if (date < minPastDate) {
+    return {
+      valid: false,
+      message: "Payment date cannot be more than 1 year in the past.",
+    };
+  }
+
+  return { valid: true };
+};
+
+const validatePaymentMethod = (paymentMethod) => {
+  const validMethods = ["credit_card", "debit_card", "paypal", "bank_transfer"];
+  return validMethods.includes(paymentMethod);
+};
+
 // ==================== NEW PAYMENT MANAGEMENT SYSTEM ====================
 
 // GET /orders/:orderId/payment - Show form to add/edit payment for an order
@@ -86,14 +212,47 @@ exports.createPaymentForOrder = (req, res) => {
     return res.redirect("/login");
   }
 
-  // Basic validation
+  // Comprehensive server-side validation
   const errors = [];
-  if (!payment_method) errors.push("Payment method is required.");
-  if (!card_number) errors.push("Card number is required.");
-  if (!expiry_date) errors.push("Expiry date is required.");
-  if (!cvv) errors.push("CVV is required.");
-  if (!amount) errors.push("Amount is required.");
-  if (!payment_date) errors.push("Payment date is required.");
+
+  // Payment method validation
+  if (!payment_method || !payment_method.trim()) {
+    errors.push("Payment method is required.");
+  } else if (!validatePaymentMethod(payment_method)) {
+    errors.push("Invalid payment method selected.");
+  }
+
+  // Card number validation
+  if (!card_number || !card_number.trim()) {
+    errors.push("Card number is required.");
+  } else if (!validateCardNumber(card_number)) {
+    errors.push("Please enter a valid card number.");
+  }
+
+  // Expiry date validation
+  const expiryValidation = validateExpiryDate(expiry_date);
+  if (!expiryValidation.valid) {
+    errors.push(expiryValidation.message);
+  }
+
+  // CVV validation
+  if (!cvv || !cvv.trim()) {
+    errors.push("CVV is required.");
+  } else if (!validateCVV(cvv)) {
+    errors.push("CVV must be 3 or 4 digits.");
+  }
+
+  // Amount validation
+  const amountValidation = validateAmount(amount);
+  if (!amountValidation.valid) {
+    errors.push(amountValidation.message);
+  }
+
+  // Payment date validation
+  const dateValidation = validatePaymentDate(payment_date);
+  if (!dateValidation.valid) {
+    errors.push(dateValidation.message);
+  }
 
   if (errors.length > 0) {
     req.flash("error", errors);
@@ -107,11 +266,11 @@ exports.createPaymentForOrder = (req, res) => {
 
   Payment.create(
     {
-      payment_method,
-      card_number,
-      expiry_date,
-      cvv,
-      amount,
+      payment_method: payment_method.trim(),
+      card_number: card_number.replace(/[\s\-]/g, ""), // Store without spaces/dashes
+      expiry_date: expiry_date.trim(),
+      cvv: cvv.trim(),
+      amount: parseFloat(amount),
       payment_date,
       order_id: parseInt(orderId),
       user_id: userId,
@@ -220,15 +379,47 @@ exports.updatePaymentDetails = (req, res) => {
     return res.redirect("/login");
   }
 
-  // Basic validation
+  // Comprehensive server-side validation
   const errors = [];
-  if (!payment_method) errors.push("Payment method is required.");
-  // Add other field validations as in create
-  if (!card_number) errors.push("Card number is required.");
-  if (!expiry_date) errors.push("Expiry date is required.");
-  if (!cvv) errors.push("CVV is required.");
-  if (!amount) errors.push("Amount is required.");
-  if (!payment_date) errors.push("Payment date is required.");
+
+  // Payment method validation
+  if (!payment_method || !payment_method.trim()) {
+    errors.push("Payment method is required.");
+  } else if (!validatePaymentMethod(payment_method)) {
+    errors.push("Invalid payment method selected.");
+  }
+
+  // Card number validation
+  if (!card_number || !card_number.trim()) {
+    errors.push("Card number is required.");
+  } else if (!validateCardNumber(card_number)) {
+    errors.push("Please enter a valid card number.");
+  }
+
+  // Expiry date validation
+  const expiryValidation = validateExpiryDate(expiry_date);
+  if (!expiryValidation.valid) {
+    errors.push(expiryValidation.message);
+  }
+
+  // CVV validation
+  if (!cvv || !cvv.trim()) {
+    errors.push("CVV is required.");
+  } else if (!validateCVV(cvv)) {
+    errors.push("CVV must be 3 or 4 digits.");
+  }
+
+  // Amount validation
+  const amountValidation = validateAmount(amount);
+  if (!amountValidation.valid) {
+    errors.push(amountValidation.message);
+  }
+
+  // Payment date validation
+  const dateValidation = validatePaymentDate(payment_date);
+  if (!dateValidation.valid) {
+    errors.push(dateValidation.message);
+  }
 
   if (errors.length > 0) {
     req.flash("error", errors);
@@ -246,11 +437,11 @@ exports.updatePaymentDetails = (req, res) => {
     paymentId,
     userId,
     {
-      payment_method,
-      card_number,
-      expiry_date,
-      cvv,
-      amount,
+      payment_method: payment_method.trim(),
+      card_number: card_number.replace(/[\s\-]/g, ""), // Store without spaces/dashes
+      expiry_date: expiry_date.trim(),
+      cvv: cvv.trim(),
+      amount: parseFloat(amount),
       payment_date,
     },
     (err, result) => {
